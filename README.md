@@ -47,14 +47,45 @@ domain/             → Entities (core business logic, no external dependencies)
 
 ---
 
-## Available Payment Scenarios
+## Available Scenarios
 
-| Scenario Name       | Fails At         |
-|---------------------|------------------|
-| `success`           | Does not fail     |
-| `insufficient_funds`| Check Funds      |
-| `auth_failure`      | Authorize Card   |
-| `fraud_detected`    | Fraud Check      |
+### Payment — `POST /run-scenario/{scenario_name}`
+
+| Scenario Name        | Fails At         |
+|----------------------|------------------|
+| `success`            | Does not fail    |
+| `insufficient_funds` | Check Funds      |
+| `auth_failure`       | Authorize Card   |
+| `fraud_detected`     | Fraud Check      |
+
+### Authentication — `GET /auth?scenario_name={scenario_name}`
+
+| Scenario Name         | Fails At             |
+|-----------------------|----------------------|
+| `success`             | Does not fail        |
+| `invalid_credentials` | Verify Password      |
+| `account_locked`      | Check Account Status |
+| `token_expired`       | Generate Token       |
+
+### Order — `GET /order?scenario_name={scenario_name}`
+
+| Scenario Name     | Fails At          |
+|-------------------|-------------------|
+| `success`         | Does not fail     |
+| `out_of_stock`    | Check Stock       |
+| `payment_declined`| Process Payment   |
+| `shipping_failure`| Dispatch Order    |
+| `order_cancelled` | Assign Warehouse  |
+
+### File Upload — `GET /file-upload?scenario_name={scenario_name}`
+
+| Scenario Name        | Fails At        |
+|----------------------|-----------------|
+| `success`            | Does not fail   |
+| `invalid_format`     | Validate File Type |
+| `file_too_large`     | Check File Size |
+| `virus_detected`     | Scan for Viruses|
+| `processing_timeout` | Process File    |
 
 ---
 
@@ -83,7 +114,7 @@ Open your browser and go to:
 http://localhost:8000/docs
 ```
 
-Use the `POST /run-scenario/{scenario_name}` endpoint and enter one of the scenario names from the table above.
+Use any of the endpoints listed in the Available Scenarios section above and enter a scenario name from the corresponding table.
 
 ---
 
