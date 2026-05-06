@@ -1,5 +1,21 @@
 # Testing Platform — API Mocking & Scenario Testing
 
+## Prerequisites
+
+Before running this project you will need the following installed:
+
+**Python 3.11**
+Download from: https://www.python.org/downloads/
+
+During installation, check **"Add Python to PATH"** — this is required for the commands below to work.
+
+**VS Code** (recommended IDE)
+Download from: https://code.visualstudio.com/
+
+After installing VS Code, install the **Python extension** (by Microsoft) from the Extensions panel.
+
+---
+
 A scenario-driven API mocking platform that simulates real-world system behaviour for developers and QA testers.
 
 Instead of relying on actual external services, you define scenarios with steps that succeed or fail exactly as they would in production. The system executes each step in order and stops at the first failure — just like a real system would.
