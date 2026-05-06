@@ -49,7 +49,7 @@ domain/             → Entities (core business logic, no external dependencies)
 
 ## Available Scenarios
 
-### Payment — `POST /run-scenario/{scenario_name}`
+### Payment — `GET /run-scenario/{scenario_name}`
 
 | Scenario Name        | Fails At         |
 |----------------------|------------------|
