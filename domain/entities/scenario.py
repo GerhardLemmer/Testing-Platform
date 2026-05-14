@@ -1,11 +1,10 @@
 class Step:
-    # This class can be used to define specific steps for a scenario
-    def __init__(self, name: str, action):
-        self.name = name
-        self.action = action
-        
-    def run(self):
-        return self.action()
+   def __init__(self, name: str, success: bool = True, message: str = ""):
+         self.name = name
+         self.success = success
+         self.message = message
+   def run(self):
+         return {"success": self.success, "message": self.message}
 
 class Scenario:
     def __init__ (self, name: str, steps: list[Step]):
