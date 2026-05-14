@@ -1,36 +1,20 @@
-# Testing Platform — API Mocking & Scenario Testing
+# Testing Platform — Scenario-Driven Workflow Simulation & Integration Testing Platform
+
+## What This Is
+
+This is NOT an API mocking tool or a request/response testing platform.
+
+This is a **scenario-driven workflow simulation and integration testing platform** for developers and QA teams. The platform simulates real business workflows — like a loan approval process, a payment flow, or an order fulfilment chain — step by step, with realistic success and failure behavior.
+
+The goal is to shift testing from "does this endpoint return 200" to "does my business process actually work end to end."
+
+---
 
 ## Prerequisites
 
-Before running this project you will need the following installed:
-
-**Python 3.11**
-Download from: https://www.python.org/downloads/
-
-During installation, check **"Add Python to PATH"** — this is required for the commands below to work.
-
-**VS Code** (recommended IDE)
-Download from: https://code.visualstudio.com/
-
-After installing VS Code, install the **Python extension** (by Microsoft) from the Extensions panel.
-
----
-
-A scenario-driven API mocking platform that simulates real-world system behaviour for developers and QA testers.
-
-Instead of relying on actual external services, you define scenarios with steps that succeed or fail exactly as they would in production. The system executes each step in order and stops at the first failure — just like a real system would.
-
----
-
-## MVP Status
-
-The following is currently working:
-
-- A request hits a mock API endpoint
-- A scenario is looked up by name
-- Steps execute in order and stop at first failure
-- A meaningful response is returned with the result and reason
-- Each request is logged to the console
+- **Python 3.14+**
+- **Docker Desktop** — for running the PostgreSQL database
+- **VS Code** (recommended) with the Python extension
 
 ---
 
@@ -39,100 +23,126 @@ The following is currently working:
 Built using Clean Architecture principles. Dependencies flow inward only.
 
 ```
-infrastructure/     → FastAPI app setup
-adapters/           → Controllers (route handlers)
+infrastructure/     → Database, auth, dependencies, repository
+adapters/           → Controllers (route handlers), schemas
 application/        → Use cases (orchestration)
 domain/             → Entities (core business logic, no external dependencies)
 ```
 
 ---
 
-## Available Scenarios
+## Current Status
 
-### Payment — `GET /run-scenario/{scenario_name}`
+### Done
+- Clean architecture foundation
+- PostgreSQL database running in Docker
+- Scenario engine — steps execute in order, stop at first failure
+- Generic scenario registry — supports any scenario type without code changes
+- Full scenario CRUD via API — create and run scenarios dynamically
+- JWT authentication — register and login
+- Protected endpoints — all scenario endpoints require a valid token
 
-| Scenario Name        | Fails At         |
-|----------------------|------------------|
-| `success`            | Does not fail    |
-| `insufficient_funds` | Check Funds      |
-| `auth_failure`       | Authorize Card   |
-| `fraud_detected`     | Fraud Check      |
+### In Progress
+- Domain and Organization model — multi-tenant workspace isolation
+- Role-based access control — admin, developer, QA, viewer roles
 
-### Authentication — `GET /auth?scenario_name={scenario_name}`
-
-| Scenario Name         | Fails At             |
-|-----------------------|----------------------|
-| `success`             | Does not fail        |
-| `invalid_credentials` | Verify Password      |
-| `account_locked`      | Check Account Status |
-| `token_expired`       | Generate Token       |
-
-### Order — `GET /order?scenario_name={scenario_name}`
-
-| Scenario Name     | Fails At          |
-|-------------------|-------------------|
-| `success`         | Does not fail     |
-| `out_of_stock`    | Check Stock       |
-| `payment_declined`| Process Payment   |
-| `shipping_failure`| Dispatch Order    |
-| `order_cancelled` | Assign Warehouse  |
-
-### File Upload — `GET /file-upload?scenario_name={scenario_name}`
-
-| Scenario Name        | Fails At        |
-|----------------------|-----------------|
-| `success`            | Does not fail   |
-| `invalid_format`     | Validate File Type |
-| `file_too_large`     | Check File Size |
-| `virus_detected`     | Scan for Viruses|
-| `processing_timeout` | Process File    |
+### Planned
+- Personal and organization workspaces
+- Frontend — developer UI and QA interface
+- GitHub and Google SSO
+- AI-assisted workflow extraction from existing codebases
 
 ---
 
 ## How to Run
 
-**1. Set up virtual environment**
+**1. Start the database**
+
+Make sure Docker Desktop is running, then start the container:
 ```
-python -m venv venv
-venv\Scripts\activate
+docker start testing-platform-db
 ```
 
-**2. Install dependencies**
+**2. Activate virtual environment**
 ```
-python -m pip install -r requirements.txt
+venv\Scripts\Activate.ps1
 ```
 
-**3. Start the server**
+**3. Install dependencies**
+```
+pip install -r requirements.txt
+```
+
+**4. Start the server**
 ```
 uvicorn main:app --reload
 ```
 
-**4. Test a scenario**
-
-Open your browser and go to:
+**5. Open Swagger UI**
 ```
 http://localhost:8000/docs
 ```
 
-Use any of the endpoints listed in the Available Scenarios section above and enter a scenario name from the corresponding table.
+---
+
+## API Endpoints
+
+### Auth
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/register` | Register a new user | No |
+| POST | `/auth/login` | Login and receive JWT token | No |
+
+### Scenarios
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/scenarios` | List all scenarios | Yes |
+| POST | `/scenarios` | Create a new scenario with steps | Yes |
+| GET | `/scenarios/{scenario_type}?scenario_name=` | Run a scenario | Yes |
 
 ---
 
-## Example Response — Auth Failure
+## Example — Create a Scenario
+
+`POST /scenarios`
 
 ```json
 {
-  "success": false,
-  "failed_step": "Authorize Card",
-  "reason": "Card declined by issuer"
+  "scenario_type": "payment",
+  "scenario_name": "insufficient_funds",
+  "display_name": "Insufficient Funds",
+  "steps": [
+    {"name": "Check Funds", "success": false, "message": "Insufficient funds", "order": 1},
+    {"name": "Authorize Card", "success": true, "message": "Card authorized", "order": 2},
+    {"name": "Process Payment", "success": true, "message": "Payment processed", "order": 3}
+  ]
 }
 ```
 
-## Example Response — Success
+---
 
+## Example Responses
+
+**Success:**
 ```json
 {
   "success": true,
   "message": "Scenario Payment Success executed successfully."
+}
+```
+
+**Failure:**
+```json
+{
+  "success": false,
+  "failed_step": "Check Funds",
+  "reason": "Insufficient funds"
+}
+```
+
+**Unauthorized:**
+```json
+{
+  "detail": "Not authenticated"
 }
 ```
