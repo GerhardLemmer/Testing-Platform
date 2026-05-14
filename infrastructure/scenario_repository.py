@@ -1,0 +1,43 @@
+import uuid 
+from sqlalchemy.orm import Session
+from domain.entities.models import ScenarioModel, StepModel
+
+def get_scenario(db: Session, scenario_type: str, scenario_name: str):
+    return db.query(ScenarioModel).filter(
+        ScenarioModel.scenario_type == scenario_type,
+        ScenarioModel.scenario_name == scenario_name
+    ).first()
+
+def get_steps(db: Session, scenario_id: str):
+    return db.query(StepModel).filter(
+        StepModel.scenario_id == scenario_id
+    ).all()
+
+def create_scenario(db: Session, scenario_type: str, scenario_name: str, display_name: str):
+    scenario = ScenarioModel(
+        id = str(uuid.uuid4()),
+        scenario_type = scenario_type,
+        scenario_name = scenario_name,
+        display_name = display_name
+    )
+    db.add(scenario)
+    db.commit()
+    db.refresh(scenario)
+    return scenario
+
+def create_step(db: Session, scenario_id: str, name: str, success: bool, message: str, order: int):
+    step = StepModel(
+        id = str(uuid.uuid4()),
+        scenario_id = scenario_id,
+        name = name,
+        success = success,
+        message = message,
+        order = order
+    )
+    db.add(step)
+    db.commit()
+    db.refresh(step)
+    return step
+
+def get_all_scenarios(db:Session):
+    return db.query(ScenarioModel).all()
