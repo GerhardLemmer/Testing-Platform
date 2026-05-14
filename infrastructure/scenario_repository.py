@@ -1,6 +1,6 @@
 import uuid 
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel
+from domain.entities.models import ScenarioModel, StepModel, User
 
 def get_scenario(db: Session, scenario_type: str, scenario_name: str):
     return db.query(ScenarioModel).filter(
@@ -41,3 +41,18 @@ def create_step(db: Session, scenario_id: str, name: str, success: bool, message
 
 def get_all_scenarios(db:Session):
     return db.query(ScenarioModel).all()
+
+def get_user_by_email(db: Session, email:str):
+    return db.query(User).filter(User.email == email).first()
+
+def create_user(db: Session, email: str, hashed_password: str, full_name: str):
+    user = User(
+        id= str(uuid.uuid4()),
+        email= email,
+        hashed_password= hashed_password,
+        full_name= full_name
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
