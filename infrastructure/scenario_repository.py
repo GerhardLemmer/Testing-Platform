@@ -105,8 +105,20 @@ def create_domain(db: Session, name: str, user_id: str = None, organization_id: 
 def get_domains_for_user(db: Session, user_id: str):
     return db.query(Domain).filter(Domain.user_id == user_id).all()
 
-def get_domains_for_org(db: Session, org_id: str):
-    return db.query(Domain).filter(Domain.organization_id == org_id).all()
+def get_org_domains_for_user(db: Session, user_id: str):
+    return (
+        db.query(Domain)
+        .join(OrganizationMember, OrganizationMember.organization_id == Domain.organization_id)
+        .filter(OrganizationMember.user_id == user_id)
+        .all()
+    )
 
 def get_domain_by_id(db: Session, domain_id: str):
     return db.query(Domain).filter(Domain.id == domain_id).first()
+
+def get_scenario_in_domain(db: Session, domain_id: str, scenario_type: str, scenario_name: str):
+    return db.query(ScenarioModel).filter(
+        ScenarioModel.domain_id == domain_id,
+        ScenarioModel.scenario_type == scenario_type,
+        ScenarioModel.scenario_name == scenario_name
+    ).first()
