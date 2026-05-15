@@ -1,6 +1,6 @@
 import uuid 
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel, User, Organization, OrganizationMember
+from domain.entities.models import ScenarioModel, StepModel, User, Organization, OrganizationMember, Domain
 
 def get_scenario(db: Session, scenario_type: str, scenario_name: str):
     return db.query(ScenarioModel).filter(
@@ -13,12 +13,13 @@ def get_steps(db: Session, scenario_id: str):
         StepModel.scenario_id == scenario_id
     ).all()
 
-def create_scenario(db: Session, scenario_type: str, scenario_name: str, display_name: str):
+def create_scenario(db: Session, domain_id: str, scenario_type: str, scenario_name: str, display_name: str):
     scenario = ScenarioModel(
-        id = str(uuid.uuid4()),
-        scenario_type = scenario_type,
-        scenario_name = scenario_name,
-        display_name = display_name
+        id=str(uuid.uuid4()),
+        domain_id=domain_id,
+        scenario_type=scenario_type,
+        scenario_name=scenario_name,
+        display_name=display_name
     )
     db.add(scenario)
     db.commit()
@@ -39,8 +40,8 @@ def create_step(db: Session, scenario_id: str, name: str, success: bool, message
     db.refresh(step)
     return step
 
-def get_all_scenarios(db:Session):
-    return db.query(ScenarioModel).all()
+def get_scenarios_for_user(db: Session, user_id: str):
+    return db.query(ScenarioModel).join(Domain).filter(Domain.user_id == user_id).all()
 
 def get_user_by_email(db: Session, email:str):
     return db.query(User).filter(User.email == email).first()
@@ -88,3 +89,24 @@ def add_organization_member(db: Session, org_id: str, user_id: str, role: str):
 
 def get_organization_member(db: Session, org_id: str, user_id: str):
     return db.query(OrganizationMember).filter(OrganizationMember.organization_id == org_id, OrganizationMember.user_id == user_id).first()
+
+def create_domain(db: Session, name: str, user_id: str = None, organization_id: str = None):
+    domain = Domain(
+        id = str(uuid.uuid4()),
+        name = name,
+        user_id = user_id,
+        organization_id = organization_id
+    )
+    db.add(domain)
+    db.commit()
+    db.refresh(domain)
+    return domain
+
+def get_domains_for_user(db: Session, user_id: str):
+    return db.query(Domain).filter(Domain.user_id == user_id).all()
+
+def get_domains_for_org(db: Session, org_id: str):
+    return db.query(Domain).filter(Domain.organization_id == org_id).all()
+
+def get_domain_by_id(db: Session, domain_id: str):
+    return db.query(Domain).filter(Domain.id == domain_id).first()
