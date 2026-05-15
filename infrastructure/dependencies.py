@@ -1,4 +1,5 @@
 import os
+import uuid
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -6,7 +7,7 @@ from infrastructure.database import SessionLocal
 from domain.entities.models import User
 from keycloak import KeycloakOpenID
 from dotenv import load_dotenv
-import uuid
+from typing import List
 
 load_dotenv()
 
@@ -29,15 +30,16 @@ def get_db():
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> User:
     token = credentials.credentials
     try:
-        token_info = keycloak_openid.introspect(token)
-        if not token_info.get("active"):
-            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        KEYCLOAK_PUBLIC_KEY = "-----BEGIN PUBLIC KEY-----\n" + keycloak_openid.public_key() + "\n-----END PUBLIC KEY-----"
+        options = {"verify_signature": True, "verify_aud": False, "verify_exp": True}
+        token_info = keycloak_openid.decode_token(token, key=KEYCLOAK_PUBLIC_KEY, options=options)
     except Exception:
         raise HTTPException(status_code=401, detail="Could not validate token")
-    
+
     keycloak_id = token_info.get("sub")
     email = token_info.get("email", "")
     full_name = token_info.get("name", "")
+    roles = token_info.get("realm_access", {}).get("roles", [])
 
     user = db.query(User).filter(User.keycloak_id == keycloak_id).first()
     if not user:
@@ -50,5 +52,13 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
         db.add(user)
         db.commit()
         db.refresh(user)
-    
+
+    user.roles = roles
     return user
+
+def require_role(allowed_roles: List[str]):
+    def role_checker(current_user: User = Depends(get_current_user)):
+        if not any(role in allowed_roles for role in getattr(current_user, "roles", [])):
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+        return current_user
+    return role_checker
