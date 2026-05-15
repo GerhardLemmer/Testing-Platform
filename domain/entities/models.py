@@ -13,8 +13,8 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(String, primary_key=True)
+    keycloak_id = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=True)
     full_name = Column(String, nullable=False)
 
 class Organization(Base):

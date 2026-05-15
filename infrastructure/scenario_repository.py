@@ -1,6 +1,6 @@
 import uuid 
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel, User
+from domain.entities.models import ScenarioModel, StepModel, User, Organization, OrganizationMember
 
 def get_scenario(db: Session, scenario_type: str, scenario_name: str):
     return db.query(ScenarioModel).filter(
@@ -56,3 +56,35 @@ def create_user(db: Session, email: str, hashed_password: str, full_name: str):
     db.commit()
     db.refresh(user)
     return user
+
+def create_organization(db: Session, name: str, owner_id: str):
+    org = Organization(
+        id = str(uuid.uuid4()),
+        name = name,
+        owner_id = owner_id
+    )
+    db.add(org)
+    db.commit()
+    db.refresh(org)
+    return org
+
+def get_organization_by_name(db: Session, name: str):
+    return db.query(Organization).filter(Organization.name == name).first()
+
+def get_organization_by_id(db: Session, org_id: str):
+    return db.query(Organization).filter(Organization.id == org_id).first()
+
+def add_organization_member(db: Session, org_id: str, user_id: str, role: str):
+    member = OrganizationMember(
+        id = str(uuid.uuid4()),
+        organization_id = org_id,
+        user_id = user_id,
+        role = role
+    )
+    db.add(member)
+    db.commit()
+    db.refresh(member)
+    return member
+
+def get_organization_member(db: Session, org_id: str, user_id: str):
+    return db.query(OrganizationMember).filter(OrganizationMember.organization_id == org_id, OrganizationMember.user_id == user_id).first()

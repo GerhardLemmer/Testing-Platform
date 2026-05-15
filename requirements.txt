@@ -6,3 +6,4 @@ psycopg[binary]==3.3.4
 python-jose[cryptography]==3.3.0
 bcrypt==4.2.1
 python-multipart==0.0.9
+python-keycloak == 3.9.1
