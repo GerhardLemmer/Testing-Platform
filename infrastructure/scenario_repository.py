@@ -1,6 +1,6 @@
 import uuid 
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel, User, Organization, OrganizationMember, Domain
+from domain.entities.models import ScenarioModel, StepModel, StepRule, ScenarioRun, User, Organization, OrganizationMember, Domain
 
 def get_scenario(db: Session, scenario_type: str, scenario_name: str):
     return db.query(ScenarioModel).filter(
@@ -26,19 +26,34 @@ def create_scenario(db: Session, domain_id: str, scenario_type: str, scenario_na
     db.refresh(scenario)
     return scenario
 
-def create_step(db: Session, scenario_id: str, name: str, success: bool, message: str, order: int):
+def create_step(db: Session, scenario_id: str, name: str, order: int, default_outcome: str = "pass"):
     step = StepModel(
-        id = str(uuid.uuid4()),
-        scenario_id = scenario_id,
-        name = name,
-        success = success,
-        message = message,
-        order = order
+        id=str(uuid.uuid4()),
+        scenario_id=scenario_id,
+        name=name,
+        order=order,
+        default_outcome=default_outcome
     )
     db.add(step)
     db.commit()
     db.refresh(step)
     return step
+
+def create_step_rule(db: Session, step_id: str, field: str, operator: str, value: str, outcome: str, message: str, order: int = 0):
+    rule = StepRule(
+        id=str(uuid.uuid4()),
+        step_id=step_id,
+        field=field,
+        operator=operator,
+        value=value,
+        outcome=outcome,
+        message=message,
+        order=order
+    )
+    db.add(rule)
+    db.commit()
+    db.refresh(rule)
+    return rule
 
 def get_scenarios_for_user(db: Session, user_id: str):
     return db.query(ScenarioModel).join(Domain).filter(Domain.user_id == user_id).all()
