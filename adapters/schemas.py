@@ -13,15 +13,9 @@ class ScenarioCreateSchema(BaseModel):
     display_name: str
     steps: List[StepSchema]
 
-class UserRegisterSchema(BaseModel):
-    email: str
-    password: str
-    full_name: str
+class OrganizationCreateSchema(BaseModel):
+    name: str
 
-class UserLoginSchema(BaseModel):
+class AddMemberSchema(BaseModel):
     email: str
-    password: str
-
-class TokenSchema(BaseModel):
-    access_token: str
-    token_type: str
+    role: str
