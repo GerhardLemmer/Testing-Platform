@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from infrastructure.dependencies import get_db, get_current_user
+from infrastructure.dependencies import get_db, get_current_user, require_role
 from infrastructure.scenario_repository import (
+    get_org_domains_for_user,
     create_domain,
     get_domains_for_user,
-    get_domains_for_org,
     get_organization_member
 )
 from adapters.schemas import DomainCreateSchema
@@ -13,7 +13,7 @@ from domain.entities.models import User
 router = APIRouter()
 
 @router.post("/domains")
-def create_new_domain(payload: DomainCreateSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_new_domain(payload: DomainCreateSchema, db: Session = Depends(get_db), current_user: User = Depends(require_role(["admin", "developer"]))):
     if payload.organization_id:
         member = get_organization_member(db, payload.organization_id, current_user.id)
         if not member:
@@ -28,4 +28,6 @@ def create_new_domain(payload: DomainCreateSchema, db: Session = Depends(get_db)
 @router.get("/domains")
 def list_domains(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     personal = get_domains_for_user(db, current_user.id)
-    return [{"id": d.id, "name": d.name, "type": "personal" if d.user_id else "organization"} for d in personal]
+    org = get_org_domains_for_user(db, current_user.id)
+    all_domains = personal + org
+    return [{"id": d.id, "name": d.name, "type": "personal" if d.user_id else "organization"} for d in all_domains]
