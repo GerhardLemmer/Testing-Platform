@@ -1,11 +1,19 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Any, Dict
+
+class StepRuleSchema(BaseModel):
+    field: str
+    operator: str
+    value: str
+    outcome: str
+    message: str
+    order: int = 0
 
 class StepSchema(BaseModel):
     name: str
-    success: bool
-    message: str
     order: int
+    default_outcome: str = "pass"
+    rules: List[StepRuleSchema] = []
 
 class ScenarioCreateSchema(BaseModel):
     domain_id: str
@@ -14,6 +22,9 @@ class ScenarioCreateSchema(BaseModel):
     display_name: str
     steps: List[StepSchema]
 
+class ScenarioRunSchema(BaseModel):
+    domain_id: str
+    input_data: Optional[Dict[str, Any]] = None
 
 class OrganizationCreateSchema(BaseModel):
     name: str
@@ -24,4 +35,4 @@ class AddMemberSchema(BaseModel):
 
 class DomainCreateSchema(BaseModel):
     name: str
-    organization_id: str = None
+    organization_id: Optional[str] = None

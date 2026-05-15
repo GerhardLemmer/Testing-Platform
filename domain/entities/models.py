@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Enum
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Enum, DateTime, Text
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship
 import enum
 from infrastructure.database import Base
@@ -55,6 +56,29 @@ class StepModel(Base):
     id = Column(String, primary_key=True)
     scenario_id = Column(String, ForeignKey("scenarios.id"), nullable=False)
     name = Column(String, nullable=False)
-    success = Column(Boolean, nullable=False)
-    message = Column(String, nullable=False)
     order = Column(Integer, nullable=False)
+    default_outcome = Column(String, nullable=False, default="pass")
+    rules = relationship("StepRule", backref="step", cascade="all, delete-orphan")
+
+class StepRule(Base):
+    __tablename__ = "step_rules"
+
+    id = Column(String, primary_key=True)
+    step_id = Column(String, ForeignKey("steps.id"), nullable=False)
+    field = Column(String, nullable=False)
+    operator = Column(String, nullable=False)
+    value = Column(String, nullable=False)
+    outcome = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    order = Column(Integer, nullable=False, default=0)
+
+class ScenarioRun(Base):
+    __tablename__ = "scenario_runs"
+
+    id = Column(String, primary_key=True)
+    scenario_id = Column(String, ForeignKey("scenarios.id"), nullable=False)
+    triggered_by = Column(String, ForeignKey("users.id"), nullable=False)
+    input_data = Column(JSON, nullable=True)
+    outcome = Column(String, nullable=False)
+    failed_step = Column(String, nullable=True)
+    created_at = Column(DateTime, nullable=False)
