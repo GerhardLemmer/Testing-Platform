@@ -36,3 +36,18 @@ class AddMemberSchema(BaseModel):
 class DomainCreateSchema(BaseModel):
     name: str
     organization_id: Optional[str] = None
+
+class ScenarioInputSchema(BaseModel):
+    field: str
+    type: str
+    label: str
+    required: bool = True
+    order: int = 0
+
+class ScenarioCreateSchema(BaseModel):
+    domain_id: str
+    scenario_type: str
+    scenario_name: str
+    display_name: str
+    steps: List[StepSchema]
+    inputs: List[ScenarioInputSchema] = []
