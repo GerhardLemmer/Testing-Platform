@@ -1,6 +1,7 @@
 import uuid 
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel, StepRule, ScenarioRun, User, Organization, OrganizationMember, Domain
+from domain.entities.models import ScenarioModel, StepModel, StepRule, ScenarioRun, User, Organization, OrganizationMember, Domain, ScenarioInput
+from datetime import datetime,timezone
 
 def get_scenario(db: Session, scenario_type: str, scenario_name: str):
     return db.query(ScenarioModel).filter(
@@ -137,3 +138,35 @@ def get_scenario_in_domain(db: Session, domain_id: str, scenario_type: str, scen
         ScenarioModel.scenario_type == scenario_type,
         ScenarioModel.scenario_name == scenario_name
     ).first()
+
+def save_scenario_run(db: Session, scenario_id: str, triggered_by: str, input_data: dict, outcome: str, failed_step: str = None):
+    run = ScenarioModel(
+        id = str(uuid.uuid4()),
+        scenario_id = scenario_id,
+        triggered_by = triggered_by,
+        input_data = input_data,
+        outcome = outcome,
+        failed_step = failed_step,
+        created_at = datetime.now(timezone.utc)
+    )
+    db.add(run)
+    db.commit()
+    return run
+
+def create_scenario_input(db: Session, scenario_id: str, field: str, type: str, label: str, required: bool = True, order: int = 0):
+    input = ScenarioInput(
+        id = str(uuid.uuid4()),
+        scenario_id = scenario_id,
+        field = field,
+        type = type,
+        label = label,
+        required = required,
+        order = order
+    )
+    db.add(input)
+    db.commit()
+    db.refresh(input)
+    return input
+
+def get_scenario_inputs(db: Session, scenario_id: str):
+    return db.query(ScenarioInput).filter(ScenarioInput.scenario_id == scenario_id).order_by(ScenarioInput.order).all()

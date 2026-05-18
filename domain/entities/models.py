@@ -82,3 +82,14 @@ class ScenarioRun(Base):
     outcome = Column(String, nullable=False)
     failed_step = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False)
+
+class ScenarioInput(Base):
+    __tablename__ = "scenario_inputs"
+
+    id = Column(String, primary_key=True)
+    scenario_id = Column(String, ForeignKey("scenarios.id"), nullable=False)
+    field = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    label = Column(String, nullable=False)
+    required = Column(Boolean, nullable=False, default=True)
+    order = Column(Integer, nullable=False, default=0)
