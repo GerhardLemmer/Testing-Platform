@@ -1,3 +1,5 @@
+NOTE: "Developed independently as a personal project. Contributions made during personal downtime outside of core work responsibilities."
+
 # Flowgate
 
 Scenario-Driven Workflow Simulation & Integration Testing Platform.
