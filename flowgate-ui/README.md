@@ -1,16 +1,74 @@
-# React + Vite
+# Flowgate — UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React frontend for the Flowgate platform. Calls the FastAPI backend at `http://localhost:8000` as an API. Auth handled by Keycloak — the app redirects to Keycloak login and attaches the JWT to all API requests.
 
-Currently, two official plugins are available:
+Two interfaces:
+- **Developer UI** — build and configure scenarios, steps, rules, and workflows
+- **QA UI** — run scenarios, fill auto-generated forms, view step-by-step results
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js LTS
+- Flowgate backend running at `http://localhost:8000`
+- Keycloak running at `http://localhost:8080`
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## How to Run
+
+```powershell
+cd C:\Testing-Platform\flowgate-ui
+npm run dev
+```
+
+Opens at `http://localhost:5173`
+
+---
+
+## Stack
+
+- React 19 + Vite 8
+- Tailwind CSS v4
+- keycloak-js + @react-keycloak/web
+
+### Planned
+- React Query — API data fetching
+- React Flow — workflow canvas (Developer UI)
+- Framer Motion — step animations (QA UI)
+
+---
+
+## Tailwind v4
+
+No `tailwind.config.js`. Configuration is in `postcss.config.js`. CSS entry is `@import "tailwindcss"` in `index.css`.
+
+---
+
+## Keycloak Setup
+
+Before auth works, create a client in Keycloak:
+
+1. Go to `http://localhost:8080` (admin/admin)
+2. Select realm `flowgate`
+3. Create client `flowgate-ui`
+4. Set as public client (no secret)
+5. Add redirect URI: `http://localhost:5173/*`
+
+---
+
+## Current Status
+
+### Done
+- Vite + React scaffold
+- Tailwind v4 configured
+- keycloak-js and @react-keycloak/web installed
+
+### Up Next
+- Keycloak client created in admin console
+- `src/keycloak.js` — Keycloak instance
+- `src/api.js` — fetch wrapper with Bearer token
+- Domain selector page
+- Scenario list page
+- QA run page with auto-generated input form
