@@ -12,10 +12,8 @@ Flowgate simulates real business workflows — loan approvals, payment flows, or
 C:\Testing-Platform\
 ├── Flowgate-backend\    → Python + FastAPI backend
 ├── flowgate-ui\         → React + Tailwind frontend
-└── README.md            → This file
+└── README.md
 ```
-
-Each subdirectory has its own README with setup and run instructions.
 
 ---
 
@@ -58,7 +56,29 @@ npm run dev
 
 ---
 
+## Current Status
+
+### Working
+- Keycloak auth end to end
+- Domain management (personal + org)
+- Rule-based scenario engine
+- ScenarioRun history recording
+- ScenarioInput schema declaration
+- Frontend: login → domain selector → domain selected
+
+### In Progress
+- Scenario list page
+- QA run page with auto-generated forms
+- App layout shell
+
+### Planned
+- Developer UI — scenario + workflow builder
+- Run history and reporting
+- AI-assisted workflow extraction
+
+---
+
 ## Further Reading
 
-- [Backend README](Flowgate-backend/README.md) — architecture, API endpoints, data model
-- [Frontend README](flowgate-ui/README.md) — setup, Keycloak config, planned features
+- [Backend README](Flowgate-backend/README.md)
+- [Frontend README](flowgate-ui/README.md)

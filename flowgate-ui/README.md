@@ -30,8 +30,8 @@ Opens at `http://localhost:5173`
 ## Stack
 
 - React 19 + Vite 8
-- Tailwind CSS v4
-- keycloak-js + @react-keycloak/web
+- Tailwind CSS v4 + @tailwindcss/postcss
+- keycloak-js (direct integration, no wrapper)
 
 ### Planned
 - React Query — API data fetching
@@ -42,19 +42,16 @@ Opens at `http://localhost:5173`
 
 ## Tailwind v4
 
-No `tailwind.config.js`. Configuration is in `postcss.config.js`. CSS entry is `@import "tailwindcss"` in `index.css`.
+No `tailwind.config.js`. PostCSS plugin is `@tailwindcss/postcss`. Custom Shamrock color palette defined in `src/index.css` using `@theme`. Use classes like `bg-shamrock-500`, `text-shamrock-300` etc.
 
 ---
 
-## Keycloak Setup
+## Keycloak
 
-Before auth works, create a client in Keycloak:
-
-1. Go to `http://localhost:8080` (admin/admin)
-2. Select realm `flowgate`
-3. Create client `flowgate-ui`
-4. Set as public client (no secret)
-5. Add redirect URI: `http://localhost:5173/*`
+- Realm: `flowgate`
+- Client: `flowgate-ui` (public, no secret)
+- Redirect URI: `http://localhost:5173/*`
+- Auth triggered on app load via `keycloak.init({ onLoad: 'login-required' })`
 
 ---
 
@@ -62,13 +59,14 @@ Before auth works, create a client in Keycloak:
 
 ### Done
 - Vite + React scaffold
-- Tailwind v4 configured
-- keycloak-js and @react-keycloak/web installed
+- Tailwind v4 + Shamrock theme configured
+- Keycloak login — full auth flow working
+- AppContext — shared domain + keycloak state
+- API client — Bearer token attached to all requests
+- Domain selector page — fetches and displays user domains
 
 ### Up Next
-- Keycloak client created in admin console
-- `src/keycloak.js` — Keycloak instance
-- `src/api.js` — fetch wrapper with Bearer token
-- Domain selector page
+- App layout shell (sidebar/nav)
 - Scenario list page
 - QA run page with auto-generated input form
+- Developer pages (create domain, create scenario)
