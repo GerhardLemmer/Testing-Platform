@@ -15,7 +15,11 @@ async function request(path, options = {}) {
 }
 
 export const getDomains = () => request('/domains')
-export const getScenarios = () => request('/scenarios')
+export const getScenarios = (domainId) => request(`/scenarios?domain_id=${domainId}`)
 export const getScenarioInputs = (scenarioId) => request(`/scenarios/${scenarioId}/inputs`)
-export const runScenario = (scenarioType, scenarioName, domainId) =>
-  request(`/scenarios/run/${scenarioType}?scenario_name=${scenarioName}&domain_id=${domainId}`)
+export const runScenario = (scenarioType, scenarioName, domainId, inputData = {}) => {
+  const params = new URLSearchParams({ scenario_name: scenarioName, domain_id: domainId, ...inputData })
+  return request(`/scenarios/run/${scenarioType}?${params}`)
+}
+export const getOrganizations = () => request('/organizations')
+export const createDomain = (name, orginization_id = null) => request('/domains', {method: 'POST', body: JSON.stringify({name, orginization_id})})

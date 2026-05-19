@@ -1,18 +1,16 @@
+import { useState } from 'react'
 import { useApp } from './context/AppContext.jsx'
 import DomainSelector from './pages/DomainSelector.jsx'
+import ScenarioList from './pages/ScenarioList.jsx'
+import RunScenario from './pages/qa/RunScenario.jsx'
 
 function App() {
   const { selectedDomain } = useApp()
+  const [selectedScenario, setSelectedScenario] = useState(null)
 
-  if (!selectedDomain) {
-    return <DomainSelector />
-  }
-
-  return (
-    <div className="min-h-screen bg-shamrock-950 text-shamrock-50 flex items-center justify-center">
-      <p className="text-shamrock-300">Domain selected: {selectedDomain.name}</p>
-    </div>
-  )
+  if (!selectedDomain) return <DomainSelector />
+  if (selectedScenario) return <RunScenario scenario={selectedScenario} onBack={() => setSelectedScenario(null)} />
+  return <ScenarioList onRun={setSelectedScenario} />
 }
 
 export default App

@@ -6,7 +6,7 @@ from infrastructure.repositories.scenario_repository import (
     create_scenario,
     create_step,
     create_step_rule,
-    get_scenarios_for_user,
+    get_scenarios_for_domain,
     create_scenario_input,
     get_scenario_inputs
 )
@@ -18,8 +18,17 @@ from domain.entities.models import User
 router = APIRouter()
 
 @router.get("/scenarios")
-def list_scenarios(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    scenarios = get_scenarios_for_user(db, current_user.id)
+def list_scenarios(domain_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    domain = get_domain_by_id(db, domain_id)
+    if not domain:
+        raise HTTPException(status_code=404, detail="Domain not found")
+    if domain.user_id != current_user.id:
+        if not domain.organization.id:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
+        member = get_organization_member(db, domain.organization.id, current_user.id)
+        if not member:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
+    scenarios = get_scenarios_for_domain(db, domain_id)
     return [
         {
             "id": s.id,
@@ -29,6 +38,7 @@ def list_scenarios(db: Session = Depends(get_db), current_user: User = Depends(g
         }
         for s in scenarios
     ]
+
 
 @router.get("/scenarios/run/{scenario_type}")
 def handle_scenario(scenario_type: str, scenario_name: str, domain_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):

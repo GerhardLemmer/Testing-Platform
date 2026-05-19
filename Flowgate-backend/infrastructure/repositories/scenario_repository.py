@@ -17,8 +17,8 @@ def get_scenario_in_domain(db: Session, domain_id: str, scenario_type: str, scen
         ScenarioModel.scenario_name == scenario_name
     ).first()
 
-def get_scenarios_for_user(db: Session, user_id: str):
-    return db.query(ScenarioModel).join(Domain).filter(Domain.user_id == user_id).all()
+def get_scenarios_for_domain(db: Session, domain_id: str):
+    return db.query(ScenarioModel).filter(ScenarioModel.domain_id == domain_id).all()
 
 def create_scenario(db: Session, domain_id: str, scenario_type: str, scenario_name: str, display_name: str):
     scenario = ScenarioModel(

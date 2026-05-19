@@ -24,6 +24,13 @@ application/        → Use cases (orchestration)
 domain/             → Entities (core business logic, no external dependencies)
 ```
 
+### Repository Pattern
+All database queries are split into focused files under `infrastructure/repositories/`:
+- `user_repository.py`
+- `organization_repository.py`
+- `domain_repository.py`
+- `scenario_repository.py`
+
 ---
 
 ## How to Run
@@ -76,13 +83,13 @@ All endpoints require a Bearer token from Keycloak.
 ### Domains
 | Method | Endpoint | Roles |
 |--------|----------|-------|
-| POST | `/domains` | admin, developer |
 | GET | `/domains` | all |
+| POST | `/domains` | admin, developer |
 
 ### Scenarios
-| Method | Endpoint | Roles |
+| Method | Endpoint | Notes |
 |--------|----------|-------|
-| GET | `/scenarios` | all |
+| GET | `/scenarios?domain_id=` | domain_id required |
 | POST | `/scenarios` | admin, developer |
 | GET | `/scenarios/run/{scenario_type}?scenario_name=&domain_id=` | all |
 | GET | `/scenarios/{scenario_id}/inputs` | all |
@@ -90,6 +97,7 @@ All endpoints require a Bearer token from Keycloak.
 ### Organizations
 | Method | Endpoint | Roles |
 |--------|----------|-------|
+| GET | `/organizations` | all |
 | POST | `/organizations` | all |
 | POST | `/organizations/{org_id}/members` | org admin |
 
@@ -157,11 +165,19 @@ First matching rule wins. If no rule matches, `default_outcome` applies.
 ### Done
 - Keycloak JWT auth end to end
 - Role-based access control (admin, developer, qa, viewer)
-- Multi-tenancy — personal and org-shared domains
+- Multi-tenancy — personal and org-shared domains with isolation enforced
 - Rule-based scenario engine
 - ScenarioInput — declared input schema per scenario
 - ScenarioRun — execution recorded on every run
+- Repository pattern — split into `infrastructure/repositories/`
+- `GET /organizations` — list orgs for current user
+
+### Known Issues
+- Run endpoint is GET — input_data sent as query params causes booleans to come through as strings
+- `execute()` in `domain/entities/scenario.py` does not return a steps array — only overall pass/fail
 
 ### Up Next
+- Fix run endpoint: change to POST, accept input_data as JSON body
+- Fix `execute()` to return full steps array with per-step outcome and message
 - Run history endpoint: `GET /scenarios/{id}/runs`
 - Input validation on execution against declared ScenarioInput schema

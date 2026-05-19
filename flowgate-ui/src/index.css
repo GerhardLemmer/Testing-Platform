@@ -2,17 +2,29 @@
 @source "../src/**/*.{js,jsx}";
 
 @theme{
-  --color-shamrock-50: #ecfdf7;
-  --color-shamrock-100: #d2f9ea;
-  --color-shamrock-200: #a9f1d9;
-  --color-shamrock-300: #57dfba;
-  --color-shamrock-400: #38cfab;
-  --color-shamrock-500: #14b594;
-  --color-shamrock-600: #099279;
-  --color-shamrock-700: #077563;
-  --color-shamrock-800: #085d50;
-  --color-shamrock-900: #084c43;
-  --color-shamrock-950: #032b26;
+  --color-chateau-green-50: #effef6;
+  --color-chateau-green-100: #d9ffec;
+  --color-chateau-green-200: #b5fdda;
+  --color-chateau-green-300: #7bfabe;
+  --color-chateau-green-400: #3bed9a;
+  --color-chateau-green-500: #11d67b;
+  --color-chateau-green-600: #07a75d;
+  --color-chateau-green-700: #0a8b50;
+  --color-chateau-green-800: #0e6d42;
+  --color-chateau-green-900: #0d5a39;
+  --color-chateau-green-950: #01321e;
+
+  --color-cherry-pie-50: #faf4ff;
+  --color-cherry-pie-100: #f2e6ff;
+  --color-cherry-pie-200: #e8d2ff;
+  --color-cherry-pie-300: #d7aeff;
+  --color-cherry-pie-400: #bf7bff;
+  --color-cherry-pie-500: #a949ff;
+  --color-cherry-pie-600: #9725f8;
+  --color-cherry-pie-700: #8215db;
+  --color-cherry-pie-800: #6e17b2;
+  --color-cherry-pie-900: #5b148f;
+  --color-cherry-pie-950: #330059;
 }
 
 

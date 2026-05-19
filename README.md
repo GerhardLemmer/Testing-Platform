@@ -60,27 +60,37 @@ npm run dev
 
 ## Current Status
 
-### Working
+### Completed
 - Keycloak auth end to end
-- Domain management (personal + org)
+- Domain management (personal + org) with isolation enforced
 - Rule-based scenario engine
 - ScenarioRun history recording
 - ScenarioInput schema declaration
-- Frontend: login → domain selector → domain selected
+- Backend repository refactor — split into `repositories/` folder (user, org, domain, scenario)
+- `GET /organizations` endpoint
+- Frontend app shell (sidebar, nav, logout)
+- Frontend domain selector — Personal / Organisation sections + create domain modal
+- Frontend scenario list — role-gated Edit button
+- Frontend QA run page — auto-rendered form from input schema, pass/fail result
+
+### Known Issues (next session)
+- Run scenario returns no step breakdown — `execute()` needs to return steps array
+- Boolean inputs sent as strings via query params — run endpoint needs to become POST with JSON body
+- `createDomain` in api.js has a typo: `orginization_id` → `organization_id`
 
 ### In Progress
-- Scenario list page
-- QA run page with auto-generated forms
-- App layout shell
+- QA run page fixes (step results + POST body)
 
 ### Planned
 - Developer UI — scenario + workflow builder
+- Create organisation page
 - Run history and reporting
+- **Org invite system** — GitHub-style inbox where users receive org/domain invites and can Accept or Decline. Invite button on domain management page searches by username or email and sends a pending invite. Replaces the current direct-add member flow for normal users.
 - AI-assisted workflow extraction
 
 ---
 
 ## Further Reading
 
-- [Backend README](Flowgate-backend/README.md)
-- [Frontend README](flowgate-ui/README.md)
+- [Backend Handoff](Flowgate-backend/handoff.md)
+- [Frontend Handoff](flowgate-ui/handoff.md)
