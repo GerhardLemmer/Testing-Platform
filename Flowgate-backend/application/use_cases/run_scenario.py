@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
-from infrastructure.scenario_repository import get_scenario, get_steps, get_scenario_in_domain, save_scenario_run
+from infrastructure.repositories.scenario_repository import get_scenario, get_steps, get_scenario_in_domain, save_scenario_run
 from domain.entities.scenario import Scenario, Step, StepRule
 
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +35,6 @@ def run_scenario_in_domain(db: Session, domain_id: str, scenario_type: str, scen
         outcome = "pass" if result["success"] else "fail"
         failed_step = result.get("failed_step")
         save_scenario_run(db, scenario_record.id, user_id, input_data or {}, outcome, failed_step)
-        
+
     logger.info(f"Domain: {domain_id} | Type: {scenario_type} | Scenario: {scenario_record.display_name} | Result: {result}")
     return result

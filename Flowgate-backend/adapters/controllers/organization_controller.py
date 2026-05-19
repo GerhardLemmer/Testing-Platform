@@ -1,24 +1,30 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from infrastructure.dependencies import get_db, get_current_user
-from infrastructure.scenario_repository import (
+from infrastructure.repositories.organization_repository import (
     create_organization,
     get_organization_by_name,
     get_organization_by_id,
     add_organization_member,
     get_organization_member,
-    get_user_by_email
+    get_organizations_for_user
 )
+from infrastructure.repositories.user_repository import get_user_by_email
 from adapters.schemas import OrganizationCreateSchema, AddMemberSchema
 from domain.entities.models import User
 
 router = APIRouter()
 
+@router.get("/organizations")
+def list_organizations(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    orgs = get_organizations_for_user(db, current_user.id)
+    return [{"id": o.id, "name": o.name} for o in orgs]
+
 @router.post("/organizations")
 def create_org(payload: OrganizationCreateSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     existing = get_organization_by_name(db, payload.name)
     if existing:
-        raise HTTPException(status_code = 400, detail = "Organization name already taken")
+        raise HTTPException(status_code=400, detail="Organization name already taken")
     org = create_organization(db, payload.name, current_user.id)
     add_organization_member(db, org.id, current_user.id, "admin")
     return {"message": f"Organization '{org.name}' created successfully.", "id": org.id}

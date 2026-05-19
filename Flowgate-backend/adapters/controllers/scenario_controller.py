@@ -2,7 +2,16 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from application.use_cases.run_scenario import run_scenario_in_domain
 from infrastructure.dependencies import get_db, get_current_user, require_role
-from infrastructure.scenario_repository import create_scenario, create_step, create_step_rule, get_scenarios_for_user, get_domain_by_id, get_organization_member, create_scenario_input, get_scenario_inputs
+from infrastructure.repositories.scenario_repository import (
+    create_scenario,
+    create_step,
+    create_step_rule,
+    get_scenarios_for_user,
+    create_scenario_input,
+    get_scenario_inputs
+)
+from infrastructure.repositories.domain_repository import get_domain_by_id
+from infrastructure.repositories.organization_repository import get_organization_member
 from adapters.schemas import ScenarioCreateSchema
 from domain.entities.models import User
 
@@ -20,6 +29,7 @@ def list_scenarios(db: Session = Depends(get_db), current_user: User = Depends(g
         }
         for s in scenarios
     ]
+
 @router.get("/scenarios/run/{scenario_type}")
 def handle_scenario(scenario_type: str, scenario_name: str, domain_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     domain = get_domain_by_id(db, domain_id)
@@ -43,8 +53,8 @@ def create_new_scenario(payload: ScenarioCreateSchema, db: Session = Depends(get
         db_step = create_step(db, scenario.id, step.name, step.order, step.default_outcome)
         for rule in step.rules:
             create_step_rule(db, db_step.id, rule.field, rule.operator, rule.value, rule.outcome, rule.message, rule.order)
-    for input in payload.inputs:
-        create_scenario_input(db, scenario.id, input.field, input.type, input.label, input.required, input.order)
+    for input_field in payload.inputs:
+        create_scenario_input(db, scenario.id, input_field.field, input_field.type, input_field.label, input_field.required, input_field.order)
     return {"success": True, "message": f"Scenario '{payload.display_name}' created successfully."}
 
 @router.get("/scenarios/{scenario_id}/inputs")
