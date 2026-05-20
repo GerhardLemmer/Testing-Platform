@@ -1,30 +1,199 @@
 @import "tailwindcss";
 @source "../src/**/*.{js,jsx}";
 
-@theme{
-  --color-chateau-green-50: #effef6;
-  --color-chateau-green-100: #d9ffec;
-  --color-chateau-green-200: #b5fdda;
-  --color-chateau-green-300: #7bfabe;
-  --color-chateau-green-400: #3bed9a;
-  --color-chateau-green-500: #11d67b;
-  --color-chateau-green-600: #07a75d;
-  --color-chateau-green-700: #0a8b50;
-  --color-chateau-green-800: #0e6d42;
-  --color-chateau-green-900: #0d5a39;
-  --color-chateau-green-950: #01321e;
-
-  --color-cherry-pie-50: #faf4ff;
-  --color-cherry-pie-100: #f2e6ff;
-  --color-cherry-pie-200: #e8d2ff;
-  --color-cherry-pie-300: #d7aeff;
-  --color-cherry-pie-400: #bf7bff;
-  --color-cherry-pie-500: #a949ff;
-  --color-cherry-pie-600: #9725f8;
-  --color-cherry-pie-700: #8215db;
-  --color-cherry-pie-800: #6e17b2;
-  --color-cherry-pie-900: #5b148f;
-  --color-cherry-pie-950: #330059;
+@theme {
+  --color-ash-50:  #f2f2f2;
+  --color-ash-100: #e0e0e0;
+  --color-ash-200: #c2c2c2;
+  --color-ash-300: #a0a0a0;
+  --color-ash-400: #707070;
+  --color-ash-500: #3a3a3a;
+  --color-ash-600: #242424;
+  --color-ash-700: #1a1a1a;
+  --color-ash-800: #131313;
+  --color-ash-900: #0d0d0d;
+  --color-ash-950: #080808;
 }
 
+/* ── Base background — dark room with off-screen light source ── */
+html, body, #root {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
 
+body {
+  background-color: #08080f;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 110% -10%, rgba(180, 140, 255, 0.55) 0%, rgba(120, 70, 255, 0.20) 40%, transparent 65%),
+    radial-gradient(ellipse 25% 20% at 102% -2%,  rgba(255, 245, 255, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse 35% 25% at -5%  108%, rgba(100, 55, 210, 0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 12% at 50%  100%, rgba(70,  40, 140, 0.12) 0%, transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* ── Liquid glass card ── */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.10) 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card-hover {
+  transition: all 0.2s ease;
+}
+
+.glass-card-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.10) 100%
+  );
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(120, 60, 220, 0.12);
+  transform: translateY(-1px);
+}
+
+/* ── Liquid glass sidebar ── */
+.glass-sidebar {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.05),
+    4px 0 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Liquid glass modal ── */
+.glass-modal {
+  background: linear-gradient(
+    135deg,
+    rgba(40, 20, 70, 0.75) 0%,
+    rgba(15, 10, 30, 0.85) 60%,
+    rgba(10, 8, 25, 0.80) 100%
+  );
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 60px rgba(120, 60, 220, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(120, 60, 220, 0.20);
+}
+
+/* ── Glass input ── */
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #f2f2f2;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(160, 100, 255, 0.5);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 0 3px rgba(120, 60, 220, 0.12);
+}
+
+.glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(230, 230, 240, 0.95) 100%
+  );
+  color: #0a0a0f;
+  font-weight: 600;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(120, 60, 220, 0.15);
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(240, 235, 255, 1) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(120, 60, 220, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  color: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.15s ease;
+}
+
+.btn-ghost:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+/* ── Status badges ── */
+.badge-pass {
+  background: rgba(74, 222, 128, 0.12);
+  color: #6ee7a0;
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.1);
+}
+
+.badge-fail {
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.1);
+}
