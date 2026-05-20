@@ -20,3 +20,4 @@ export const getScenarioInputs = (scenarioId) => request(`/scenarios/${scenarioI
 export const runScenario = (scenarioType, scenarioName, domainId, inputData) => request('/scenarios/run', {method: 'POST', body: JSON.stringify({ scenario_type: scenarioType, scenario_name: scenarioName, domain_id: domainId, input_data: inputData })})
 export const getOrganizations = () => request('/organizations')
 export const createDomain = (name, organization_id = null) => request('/domains', {method: 'POST', body: JSON.stringify({name, organization_id})})
+export const createScenario = (payload) => request('/scenarios', {method: 'POST', body: JSON.stringify(payload)})

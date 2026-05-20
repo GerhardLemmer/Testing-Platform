@@ -3,7 +3,7 @@ import { getScenarios } from '../api/api.js'
 import { useApp } from '../context/AppContext.jsx'
 import AppShell from '../components/AppShell.jsx'
 
-function ScenarioList({ onRun }) {
+function ScenarioList({ onRun, onNavigate }) {
   const { selectedDomain, keycloak } = useApp()
   const [scenarios, setScenarios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +20,7 @@ function ScenarioList({ onRun }) {
   }, [selectedDomain.id])
 
   return (
-    <AppShell>
+    <AppShell onNavigate={onNavigate} currentPage="scenarios">
       <div className="max-w-3xl">
         <div className="flex items-center justify-between mb-8">
           <div>

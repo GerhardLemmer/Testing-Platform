@@ -1,8 +1,10 @@
 import { useApp } from "../context/AppContext";
 
-function AppShell({ children }){
+function AppShell({ children, onNavigate, currentPage }) {
     const { keycloak, selectedDomain, setSelectedDomain } = useApp()
     const username = keycloak.tokenParsed?.preferred_username
+    const roles = keycloak.tokenParsed?.realm_access?.roles ?? []
+    const isDeveloper = roles.includes('developer') || roles.includes('admin')
 
     return(
         <div className="min-h-screen flex">
@@ -14,11 +16,36 @@ function AppShell({ children }){
                     )}
                 </div>
 
-                <nav className="flex-1 px-4 py-4">
-                    <p className="text-ash-400 text-xs uppercase tracking-wider mb-2 px-3">Navigation</p>
+                <nav className="flex-1 px-4 py-4 space-y-1">
+                    <p className="text-ash-500 text-xs uppercase tracking-wider mb-2 px-3">Navigation</p>
+
+                    <button
+                        onClick={() => onNavigate?.('scenarios')}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                            currentPage === 'scenarios' || !currentPage
+                                ? 'bg-white/[0.09] text-ash-50'
+                                : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50'
+                        }`}
+                    >
+                        Scenarios
+                    </button>
+
+                    {isDeveloper && (
+                        <button
+                            onClick={() => onNavigate?.('builder')}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                                currentPage === 'builder'
+                                    ? 'bg-white/[0.09] text-ash-50'
+                                    : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50'
+                            }`}
+                        >
+                            Builder
+                        </button>
+                    )}
+
                     <button
                         onClick={() => setSelectedDomain(null)}
-                        className="w-full text-left px-3 py-2 rounded-lg text-ash-200 hover:bg-white/[0.07] hover:text-ash-50 text-sm transition-colors"
+                        className="w-full text-left px-3 py-2 rounded-lg text-ash-400 hover:bg-white/[0.06] hover:text-ash-200 text-sm transition-colors"
                     >
                         Change Domain
                     </button>
