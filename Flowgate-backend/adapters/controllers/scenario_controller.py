@@ -12,7 +12,7 @@ from infrastructure.repositories.scenario_repository import (
 )
 from infrastructure.repositories.domain_repository import get_domain_by_id
 from infrastructure.repositories.organization_repository import get_organization_member
-from adapters.schemas import ScenarioCreateSchema
+from adapters.schemas import ScenarioCreateSchema, ScenarioRunSchema
 from domain.entities.models import User
 
 router = APIRouter()
@@ -23,9 +23,9 @@ def list_scenarios(domain_id: str, db: Session = Depends(get_db), current_user: 
     if not domain:
         raise HTTPException(status_code=404, detail="Domain not found")
     if domain.user_id != current_user.id:
-        if not domain.organization.id:
+        if not domain.organization_id:
             raise HTTPException(status_code=403, detail="Access denied to this domain")
-        member = get_organization_member(db, domain.organization.id, current_user.id)
+        member = get_organization_member(db, domain.organization_id, current_user.id)
         if not member:
             raise HTTPException(status_code=403, detail="Access denied to this domain")
     scenarios = get_scenarios_for_domain(db, domain_id)
@@ -38,23 +38,6 @@ def list_scenarios(domain_id: str, db: Session = Depends(get_db), current_user: 
         }
         for s in scenarios
     ]
-
-
-@router.get("/scenarios/run/{scenario_type}")
-def handle_scenario(scenario_type: str, scenario_name: str, domain_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    domain = get_domain_by_id(db, domain_id)
-    if not domain:
-        raise HTTPException(status_code=404, detail="Domain not found")
-    if domain.user_id != current_user.id:
-        if not domain.organization_id:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
-        member = get_organization_member(db, domain.organization_id, current_user.id)
-        if not member:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
-    result = run_scenario_in_domain(db, domain_id, scenario_type, scenario_name, user_id=current_user.id)
-    if result is None:
-        raise HTTPException(status_code=404, detail="Scenario not found")
-    return result
 
 @router.post("/scenarios")
 def create_new_scenario(payload: ScenarioCreateSchema, db: Session = Depends(get_db), current_user: User = Depends(require_role(["admin", "developer"]))):
@@ -74,3 +57,19 @@ def get_inputs(scenario_id: str, db: Session = Depends(get_db), current_user: Us
         {"field": i.field, "type": i.type, "label": i.label, "required": i.required, "order": i.order}
         for i in inputs
     ]
+
+@router.post("/scenarios/run")
+def run_scenarios(payload: ScenarioRunSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    domain = get_domain_by_id(db, payload.domain_id)
+    if not domain:
+        raise HTTPException(status_code=404, detail="Domain not found")
+    if domain.user_id != current_user.id:
+        if not domain.organization_id:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
+        member = get_organization_member(db, domain.organization_id, current_user.id)
+        if not member:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
+    scenarios = run_scenario_in_domain(db, payload.domain_id, payload.scenario_type, payload.scenario_name, payload.input_data, current_user.id)
+    if scenarios is None:
+        raise HTTPException(status_code=401, detail="Invalid scenario details")
+    return scenarios

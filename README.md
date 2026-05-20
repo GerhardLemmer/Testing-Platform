@@ -73,14 +73,6 @@ npm run dev
 - Frontend scenario list — role-gated Edit button
 - Frontend QA run page — auto-rendered form from input schema, pass/fail result
 
-### Known Issues (next session)
-- Run scenario returns no step breakdown — `execute()` needs to return steps array
-- Boolean inputs sent as strings via query params — run endpoint needs to become POST with JSON body
-- `createDomain` in api.js has a typo: `orginization_id` → `organization_id`
-
-### In Progress
-- QA run page fixes (step results + POST body)
-
 ### Planned
 - Developer UI — scenario + workflow builder
 - Create organisation page

@@ -15,16 +15,11 @@ class StepSchema(BaseModel):
     default_outcome: str = "pass"
     rules: List[StepRuleSchema] = []
 
-class ScenarioCreateSchema(BaseModel):
-    domain_id: str
-    scenario_type: str
-    scenario_name: str
-    display_name: str
-    steps: List[StepSchema]
-
 class ScenarioRunSchema(BaseModel):
     domain_id: str
     input_data: Optional[Dict[str, Any]] = None
+    scenario_name: str
+    scenario_type: str
 
 class OrganizationCreateSchema(BaseModel):
     name: str

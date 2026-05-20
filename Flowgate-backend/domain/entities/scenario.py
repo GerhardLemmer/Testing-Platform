@@ -62,8 +62,15 @@ class Scenario:
 
     def execute(self, input_data: dict = None) -> dict:
         input_data = input_data or {}
+        steps_result = []
+        overall_success = True
+        failed_step = None
+
         for step in self.steps:
             result = step.run(input_data)
-            if not result["success"]:
-                return {"success": False, "failed_step": step.name, "reason": result["message"]}
-        return {"success": True, "message": f"Scenario '{self.name}' executed successfully."}
+            outcome = "pass" if result["success"] else "fail"
+            steps_result.append({"name": step.name, "outcome": outcome, "message": result["message"]})
+            if not result["success"] and overall_success:
+                overall_success = False
+                failed_step = step.name
+        return {"success": overall_success, "failed_step": failed_step, "steps": steps_result}
