@@ -87,5 +87,5 @@ npm run dev
 
 ## Further Reading
 
-- [Backend Handoff](Flowgate-backend/handoff.md)
-- [Frontend Handoff](flowgate-ui/handoff.md)
+- [Backend README](Flowgate-backend/README.md)
+- [Frontend README](flowgate-ui/README.md)
