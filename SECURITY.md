@@ -14,7 +14,7 @@ Flowgate is currently in early development. Only the latest version on the `main
 
 If you discover a security vulnerability, please do **not** open a public GitHub issue.
 
-Instead, report it privately by emailing: **lemmerg@selectafrica.net**
+Instead, report it privately by emailing: **glemmer94@gmail.com**
 
 Please include:
 - A description of the vulnerability
