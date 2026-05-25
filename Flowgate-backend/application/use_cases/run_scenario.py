@@ -1,6 +1,6 @@
 import logging
 from sqlalchemy.orm import Session
-from infrastructure.repositories.scenario_repository import get_scenario, get_steps, get_scenario_in_domain, save_scenario_run
+from infrastructure.repositories.scenario_repository import get_scenario, get_steps, get_scenario_in_domain, save_scenario_run, get_scenario_inputs
 from domain.entities.scenario import Scenario, Step, StepRule
 
 logging.basicConfig(level=logging.INFO)
@@ -27,6 +27,13 @@ def run_scenario_in_domain(db: Session, domain_id: str, scenario_type: str, scen
     scenario_record = get_scenario_in_domain(db, domain_id, scenario_type, scenario_name)
     if scenario_record is None:
         return None
+    inputs = get_scenario_inputs(db, scenario_record.id)
+    missing = []
+    for inp in inputs:
+        if inp.required and inp.field not in (input_data or {}):
+            missing.append(inp.field)
+    if missing:
+        return {"error": "missing_inputs", "missing": missing}
     step_record = get_steps(db, scenario_record.id)
     scenario = _build_scenario(scenario_record, step_record)
     result = scenario.execute(input_data or {})

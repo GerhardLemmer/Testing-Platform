@@ -101,3 +101,45 @@ def get_scenario_inputs(db: Session, scenario_id: str):
         .order_by(ScenarioInput.order)
         .all()
     )
+
+def get_scenario_runs(db: Session, scenario_id: str):
+    return(
+        db.query(ScenarioRun)
+        .filter(ScenarioRun.scenario_id == scenario_id)
+        .order_by(ScenarioRun.created_at.desc())
+        .all()
+    )
+
+def get_scenario_by_id(db: Session, scenario_id: str):
+    return(
+        db.query(ScenarioModel)
+        .filter(ScenarioModel.id == scenario_id)
+        .first()
+    )
+
+def delete_scenario_steps(db: Session, scenario_id: str):
+    steps = db.query(StepModel).filter(StepModel.scenario_id == scenario_id).all()
+    for step in steps:
+        db.query(StepRule).filter(StepRule.step_id == step.id).delete()
+    db.query(StepModel).filter(StepModel.scenario_id == scenario_id).delete()
+    db.query(ScenarioInput).filter(ScenarioInput.scenario_id == scenario_id).delete()
+    db.commit()
+
+def update_scenario_details(db: Session, scenario_id: str, scenario_type: str, scenario_name: str, display_name: str):
+    scenario = db.query(ScenarioModel).filter(ScenarioModel.id == scenario_id).first()
+    scenario.scenario_type = scenario_type
+    scenario.scenario_name = scenario_name
+    scenario.display_name = display_name
+    db.commit()
+    db.refresh(scenario)
+    return scenario
+
+def delete_scenario(db: Session, scenario_id: str):
+    steps = db.query(StepModel).filter(StepModel.scenario_id == scenario_id).all()
+    for step in steps:
+        db.query(StepRule).filter(StepRule.step_id == step.id).delete()
+    db.query(StepModel).filter(StepModel.scenario_id == scenario_id).delete()
+    db.query(ScenarioInput).filter(ScenarioInput.scenario_id == scenario_id).delete()
+    db.query(ScenarioRun).filter(ScenarioRun.scenario_id == scenario_id).delete()
+    db.query(ScenarioModel).filter(ScenarioModel.id == scenario_id).delete()
+    db.commit()
