@@ -66,17 +66,20 @@ npm run dev
 - Rule-based scenario engine
 - ScenarioRun history recording
 - ScenarioInput schema declaration
-- Backend repository refactor — split into `repositories/` folder (user, org, domain, scenario)
-- `GET /organizations` endpoint
+- Input validation on execution — 422 with missing field list
+- Full scenario CRUD — GET (list + single with nested steps/rules/inputs), POST, PUT, DELETE
+- Run history endpoint — `GET /scenarios/{id}/runs`
+- Backend repository pattern — split into `repositories/` folder
 - Frontend app shell (sidebar, nav, logout)
 - Frontend domain selector — Personal / Organisation sections + create domain modal
 - Frontend scenario list — role-gated Edit button
-- Frontend QA run page — auto-rendered form from input schema, pass/fail result
+- Frontend QA run page — auto-rendered form from input schema, step-by-step results
+- Frontend ScenarioBuilder — create scenario with steps, rules, and input fields
 
 ### Planned
-- Developer UI — scenario + workflow builder
+- Scenario edit form — load existing scenario into ScenarioBuilder, save via PUT
+- Run history page — list past ScenarioRuns per scenario
 - Create organisation page
-- Run history and reporting
 - **Org invite system** — GitHub-style inbox where users receive org/domain invites and can Accept or Decline. Invite button on domain management page searches by username or email and sends a pending invite. Replaces the current direct-add member flow for normal users.
 - AI-assisted workflow extraction
 
