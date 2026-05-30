@@ -15,7 +15,9 @@ async function request(path, options = {}) {
 }
 
 export const getDomains = () => request('/domains')
-export const getScenarios = () => request('/scenarios')
+export const getScenarios = (domainId) => request(`/scenarios?domain_id=${domainId}`)
 export const getScenarioInputs = (scenarioId) => request(`/scenarios/${scenarioId}/inputs`)
-export const runScenario = (scenarioType, scenarioName, domainId) =>
-  request(`/scenarios/run/${scenarioType}?scenario_name=${scenarioName}&domain_id=${domainId}`)
+export const runScenario = (scenarioType, scenarioName, domainId, inputData) => request('/scenarios/run', {method: 'POST', body: JSON.stringify({ scenario_type: scenarioType, scenario_name: scenarioName, domain_id: domainId, input_data: inputData })})
+export const getOrganizations = () => request('/organizations')
+export const createDomain = (name, organization_id = null) => request('/domains', {method: 'POST', body: JSON.stringify({name, organization_id})})
+export const createScenario = (payload) => request('/scenarios', {method: 'POST', body: JSON.stringify(payload)})

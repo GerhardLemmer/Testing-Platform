@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "cross-env NODE_OPTIONS=--max-http-header-size=65536 vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

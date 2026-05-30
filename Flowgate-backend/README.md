@@ -24,6 +24,13 @@ application/        → Use cases (orchestration)
 domain/             → Entities (core business logic, no external dependencies)
 ```
 
+### Repository Pattern
+All database queries are split into focused files under `infrastructure/repositories/`:
+- `user_repository.py`
+- `organization_repository.py`
+- `domain_repository.py`
+- `scenario_repository.py`
+
 ---
 
 ## How to Run
@@ -76,20 +83,25 @@ All endpoints require a Bearer token from Keycloak.
 ### Domains
 | Method | Endpoint | Roles |
 |--------|----------|-------|
-| POST | `/domains` | admin, developer |
 | GET | `/domains` | all |
+| POST | `/domains` | admin, developer |
 
 ### Scenarios
-| Method | Endpoint | Roles |
+| Method | Endpoint | Notes |
 |--------|----------|-------|
-| GET | `/scenarios` | all |
+| GET | `/scenarios?domain_id=` | domain_id required |
 | POST | `/scenarios` | admin, developer |
-| GET | `/scenarios/run/{scenario_type}?scenario_name=&domain_id=` | all |
-| GET | `/scenarios/{scenario_id}/inputs` | all |
+| GET | `/scenarios/{id}` | full nested response — steps, rules, inputs |
+| PUT | `/scenarios/{id}` | admin, developer — delete-and-recreate steps/rules/inputs |
+| DELETE | `/scenarios/{id}` | admin, developer — cascade deletes all related data |
+| GET | `/scenarios/{id}/inputs` | input schema for form rendering |
+| GET | `/scenarios/{id}/runs` | run history, newest first |
+| POST | `/scenarios/run` | runs scenario, validates required inputs first |
 
 ### Organizations
 | Method | Endpoint | Roles |
 |--------|----------|-------|
+| GET | `/organizations` | all |
 | POST | `/organizations` | all |
 | POST | `/organizations/{org_id}/members` | org admin |
 
@@ -157,11 +169,15 @@ First matching rule wins. If no rule matches, `default_outcome` applies.
 ### Done
 - Keycloak JWT auth end to end
 - Role-based access control (admin, developer, qa, viewer)
-- Multi-tenancy — personal and org-shared domains
-- Rule-based scenario engine
+- Multi-tenancy — personal and org-shared domains with isolation enforced
+- Rule-based scenario engine — first match wins, default_outcome fallback
 - ScenarioInput — declared input schema per scenario
+- Input validation on execution — 422 with missing field list if required inputs absent
 - ScenarioRun — execution recorded on every run
+- Full scenario CRUD — GET (list + single), POST, PUT, DELETE
+- Run history — `GET /scenarios/{id}/runs`
+- Repository pattern — split into `infrastructure/repositories/`
 
 ### Up Next
-- Run history endpoint: `GET /scenarios/{id}/runs`
-- Input validation on execution against declared ScenarioInput schema
+- Org invite system — GitHub-style inbox, users receive invites and can Accept/Decline
+- Domain-level access control on single-scenario endpoints (GET/{id}, PUT, DELETE)

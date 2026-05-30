@@ -25,6 +25,8 @@ npm run dev
 
 Opens at `http://localhost:5173`
 
+**Note:** The dev script uses `cross-env NODE_OPTIONS=--max-http-header-size=65536` to handle large Keycloak JWT headers through Vite's proxy. Just run `npm run dev` as normal.
+
 ---
 
 ## Stack
@@ -40,9 +42,20 @@ Opens at `http://localhost:5173`
 
 ---
 
+## Colour Palette
+
+Two custom palettes defined in `src/index.css` — capped at 700, nothing darker used in components.
+
+| Palette | Purpose |
+|---------|---------|
+| `cherry-pie` | Backgrounds, surfaces, sidebar, cards, text |
+| `chateau-green` | Primary actions only — buttons, active states, pass indicators |
+
+---
+
 ## Tailwind v4
 
-No `tailwind.config.js`. PostCSS plugin is `@tailwindcss/postcss`. Custom Shamrock color palette defined in `src/index.css` using `@theme`. Use classes like `bg-shamrock-500`, `text-shamrock-300` etc.
+No `tailwind.config.js`. PostCSS plugin is `@tailwindcss/postcss`. Custom palettes defined in `src/index.css` using `@theme`.
 
 ---
 
@@ -51,22 +64,41 @@ No `tailwind.config.js`. PostCSS plugin is `@tailwindcss/postcss`. Custom Shamro
 - Realm: `flowgate`
 - Client: `flowgate-ui` (public, no secret)
 - Redirect URI: `http://localhost:5173/*`
-- Auth triggered on app load via `keycloak.init({ onLoad: 'login-required' })`
+- Auth triggered on app load via `keycloak.init({ onLoad: 'login-required', pkceMethod: 'S256' })`
+
+---
+
+## App Routing
+
+State-based routing in `App.jsx` — no router library:
+
+```
+No domain selected    → DomainSelector
+Domain selected       → ScenarioList
+Scenario selected     → RunScenario (qa/)
+```
 
 ---
 
 ## Current Status
 
 ### Done
-- Vite + React scaffold
-- Tailwind v4 + Shamrock theme configured
 - Keycloak login — full auth flow working
 - AppContext — shared domain + keycloak state
 - API client — Bearer token attached to all requests
-- Domain selector page — fetches and displays user domains
+- Domain selector — Personal / Organisation sections, create domain modal with org picker
+- App shell — sidebar with domain name, username, logout, change domain
+- Scenario list — fetches by domain, role-gated Edit button (admin/developer only)
+- QA run page — auto-rendered form from input schema, pass/fail result display
+
+### Known Issues
+- Run result shows no step breakdown — backend execute() doesn't return steps array
+- Boolean inputs sent as query param strings — run endpoint needs to become POST with JSON body
+- `createDomain` in api.js has typo: `orginization_id` should be `organization_id`
 
 ### Up Next
-- App layout shell (sidebar/nav)
-- Scenario list page
-- QA run page with auto-generated input form
-- Developer pages (create domain, create scenario)
+- Fix run endpoint (POST body) + fix step results display
+- Developer pages — create scenario with step + rule builder
+- Create organisation page
+- Run history page
+- Notification inbox — org invite system
