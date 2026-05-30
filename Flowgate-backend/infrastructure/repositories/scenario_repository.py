@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.orm import Session
-from domain.entities.models import ScenarioModel, StepModel, StepRule, ScenarioRun, Domain, ScenarioInput
+from infrastructure.models import ScenarioModel, StepModel, StepRule, ScenarioRun, ScenarioInput
 from datetime import datetime, timezone
 
 

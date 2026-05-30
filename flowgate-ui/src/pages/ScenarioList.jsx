@@ -3,7 +3,7 @@ import { getScenarios } from '../api/api.js'
 import { useApp } from '../context/AppContext.jsx'
 import AppShell from '../components/AppShell.jsx'
 
-function ScenarioList({ onRun, onNavigate }) {
+function ScenarioList({ onRun, onHistory, onNavigate }) {
   const { selectedDomain, keycloak } = useApp()
   const [scenarios, setScenarios] = useState([])
   const [loading, setLoading] = useState(true)
@@ -47,6 +47,12 @@ function ScenarioList({ onRun, onNavigate }) {
                 <p className="text-ash-400 text-sm mt-1">{scenario.scenario_type}</p>
               </div>
               <div className="flex gap-3">
+                <button
+                  onClick={() => onHistory(scenario)}
+                  className="btn-ghost px-4 py-2 rounded-lg text-sm"
+                >
+                  History
+                </button>
                 <button
                   onClick={() => onRun(scenario)}
                   className="btn-primary px-4 py-2 rounded-lg text-sm"

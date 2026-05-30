@@ -43,6 +43,17 @@ function AppShell({ children, onNavigate, currentPage }) {
                         </button>
                     )}
 
+                    <button
+                        onClick={() => onNavigate?.('organisations')}
+                        className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all ${
+                            currentPage === 'organisations'
+                                ? 'nav-item-active'
+                                : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50 border-l-2 border-transparent'
+                        }`}
+                    >
+                        Organisations
+                    </button>
+
                     <div className="pt-3 mt-3 border-t border-white/[0.06]">
                         <button
                             onClick={() => setSelectedDomain(null)}

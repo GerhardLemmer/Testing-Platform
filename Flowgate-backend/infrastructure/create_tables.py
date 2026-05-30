@@ -1,5 +1,5 @@
 from infrastructure.database import engine, Base
-from domain.entities.models import User, Organization, OrganizationMember, Domain, ScenarioModel, StepModel, StepRule, ScenarioRun, ScenarioInput
+from infrastructure.models import User, Organization, OrganizationMember, Domain, ScenarioModel, StepModel, StepRule, ScenarioRun, ScenarioInput
 
 
 Base.metadata.drop_all(bind=engine)

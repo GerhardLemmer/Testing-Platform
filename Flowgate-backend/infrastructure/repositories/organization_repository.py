@@ -1,6 +1,6 @@
 import uuid
 from sqlalchemy.orm import Session
-from domain.entities.models import Organization, OrganizationMember
+from infrastructure.models import Organization, OrganizationMember
 
 
 def create_organization(db: Session, name: str, owner_id: str):

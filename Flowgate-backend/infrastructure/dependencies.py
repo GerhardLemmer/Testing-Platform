@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from infrastructure.database import SessionLocal
-from domain.entities.models import User
+from infrastructure.models import User
 from keycloak import KeycloakOpenID
 from dotenv import load_dotenv
 from typing import List

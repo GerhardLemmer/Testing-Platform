@@ -51,8 +51,7 @@ class Step:
             result = rule.evaluate(input_data)
             if result:
                 return {"success": result["outcome"] == "pass", "message": result["message"]}
-        success = self.default_outcome == "pass"
-        return {"success": success, "message": "Default outcome"}
+        return {"success": self.default_outcome == "pass", "message": "Default outcome"}
 
 
 class Scenario:
@@ -73,4 +72,5 @@ class Scenario:
             if not result["success"] and overall_success:
                 overall_success = False
                 failed_step = step.name
+
         return {"success": overall_success, "failed_step": failed_step, "steps": steps_result}
