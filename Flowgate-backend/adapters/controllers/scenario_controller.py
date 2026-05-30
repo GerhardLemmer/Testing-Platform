@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from application.use_cases.run_scenario import run_scenario_in_domain
-from infrastructure.dependencies import get_db, get_current_user, require_role
+from infrastructure.dependencies import get_db, get_current_user, require_role, check_domain_access
 from infrastructure.repositories.scenario_repository import (
     create_scenario,
     create_step,
@@ -16,8 +16,6 @@ from infrastructure.repositories.scenario_repository import (
     update_scenario_details,
     delete_scenario
 )
-from infrastructure.repositories.domain_repository import get_domain_by_id
-from infrastructure.repositories.organization_repository import get_organization_member
 from adapters.schemas import ScenarioCreateSchema, ScenarioRunSchema
 from domain.entities.models import User
 
@@ -25,15 +23,7 @@ router = APIRouter()
 
 @router.get("/scenarios")
 def list_scenarios(domain_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    domain = get_domain_by_id(db, domain_id)
-    if not domain:
-        raise HTTPException(status_code=404, detail="Domain not found")
-    if domain.user_id != current_user.id:
-        if not domain.organization_id:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
-        member = get_organization_member(db, domain.organization_id, current_user.id)
-        if not member:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
+    check_domain_access(domain_id, current_user, db)
     scenarios = get_scenarios_for_domain(db, domain_id)
     return [
         {
@@ -66,15 +56,7 @@ def get_inputs(scenario_id: str, db: Session = Depends(get_db), current_user: Us
 
 @router.post("/scenarios/run")
 def run_scenarios(payload: ScenarioRunSchema, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    domain = get_domain_by_id(db, payload.domain_id)
-    if not domain:
-        raise HTTPException(status_code=404, detail="Domain not found")
-    if domain.user_id != current_user.id:
-        if not domain.organization_id:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
-        member = get_organization_member(db, domain.organization_id, current_user.id)
-        if not member:
-            raise HTTPException(status_code=403, detail="Access denied to this domain")
+    check_domain_access(payload.domain_id, current_user, db)
     scenarios = run_scenario_in_domain(db, payload.domain_id, payload.scenario_type, payload.scenario_name, payload.input_data, current_user.id)
     if scenarios is None:
         raise HTTPException(status_code=401, detail="Invalid scenario details")
@@ -101,6 +83,7 @@ def get_scenario_with_id(scenario_id: str, db: Session = Depends(get_db), curren
     scenario = get_scenario_by_id(db, scenario_id)
     if not scenario:
         raise HTTPException(status_code=404, detail="Scenario not found")
+    check_domain_access(scenario.domain_id, current_user, db)
     steps = get_steps(db, scenario_id)
     inputs = get_scenario_inputs(db, scenario_id)
     return{
@@ -132,7 +115,8 @@ def update_scenario_by_id(scenario_id: str, payload: ScenarioCreateSchema, db: S
     scenario = get_scenario_by_id(db, scenario_id)
     if not scenario:
         raise HTTPException(status_code=404, detail="Scenario was not found")
-    update_scenario_details(db, scenario.id, payload.scenario_type, payload.scenario_name, payload.display_name)
+    check_domain_access(scenario.domain_id, current_user, db)
+    update_scenario_details(db, scenario_id, payload.scenario_type, payload.scenario_name, payload.display_name)
     delete_scenario_steps(db, scenario.id)
     for step in payload.steps:
         db_step = create_step(db, scenario.id, step.name, step.order, step.default_outcome)
@@ -147,6 +131,7 @@ def delete_scenario_by_id(scenario_id: str, db: Session = Depends(get_db), curre
     scenario = get_scenario_by_id(db, scenario_id)
     if not scenario:
         raise HTTPException(status_code=404, detail="Scenario not found")
+    check_domain_access(scenario.domain_id, current_user, db)
     delete_scenario(db, scenario_id)
     return {"success": True, "message": f"Scenario '{scenario.display_name}' deleted successfully."}
 

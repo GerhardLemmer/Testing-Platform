@@ -15,7 +15,7 @@
   --color-ash-950: #080808;
 }
 
-/* ── Base background — dark room with off-screen light source ── */
+/* ── Base background ── */
 html, body, #root {
   min-height: 100vh;
   margin: 0;
@@ -24,32 +24,113 @@ html, body, #root {
 
 body {
   background-color: #08080f;
-  background-image:
-    radial-gradient(ellipse 60% 50% at 110% -10%, rgba(180, 140, 255, 0.55) 0%, rgba(120, 70, 255, 0.20) 40%, transparent 65%),
-    radial-gradient(ellipse 25% 20% at 102% -2%,  rgba(255, 245, 255, 0.25) 0%, transparent 45%),
-    radial-gradient(ellipse 45% 40% at -5%  105%, rgba(130, 70, 255, 0.35) 0%, rgba(90, 40, 200, 0.12) 45%, transparent 65%),
-    radial-gradient(ellipse 20% 15% at 0%   100%, rgba(200, 160, 255, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse 70% 12% at 50%  100%, rgba(70,  40, 140, 0.10) 0%, transparent 60%);
-  background-attachment: fixed;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated light orbs */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  width: 70vw;
+  height: 65vh;
+  background: radial-gradient(ellipse, rgba(170, 120, 255, 0.42) 0%, rgba(110, 55, 240, 0.15) 40%, transparent 68%);
+  filter: blur(55px);
+  top: -25vh;
+  right: -20vw;
+  animation: orb-top 28s ease-in-out infinite alternate;
+}
+
+body::after {
+  width: 55vw;
+  height: 55vh;
+  background: radial-gradient(ellipse, rgba(100, 50, 220, 0.35) 0%, rgba(75, 30, 175, 0.12) 45%, transparent 68%);
+  filter: blur(65px);
+  bottom: -20vh;
+  left: -15vw;
+  animation: orb-bottom 35s ease-in-out infinite alternate;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+#root::before {
+  content: '';
+  position: fixed;
+  width: 30vw;
+  height: 30vh;
+  background: radial-gradient(ellipse, rgba(140, 80, 255, 0.20) 0%, transparent 65%);
+  filter: blur(60px);
+  top: 40vh;
+  left: 35vw;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: orb-mid 42s ease-in-out infinite alternate;
+}
+
+@keyframes orb-mid {
+  0%   { transform: translate(0,    0)    scale(1);    }
+  30%  { transform: translate(8vw,  -6vh) scale(1.12); }
+  60%  { transform: translate(-6vw, 8vh)  scale(0.90); }
+  100% { transform: translate(5vw,  5vh)  scale(1.06); }
+}
+
+@keyframes orb-top {
+  0%   { transform: translate(0,     0)    scale(1);    }
+  25%  { transform: translate(-8vw,  6vh)  scale(1.08); }
+  50%  { transform: translate(-3vw,  12vh) scale(0.95); }
+  75%  { transform: translate(-12vw, 4vh)  scale(1.05); }
+  100% { transform: translate(-6vw,  9vh)  scale(1.1);  }
+}
+
+@keyframes orb-bottom {
+  0%   { transform: translate(0,    0)     scale(1);    }
+  25%  { transform: translate(9vw,  -5vh)  scale(1.06); }
+  50%  { transform: translate(4vw,  -11vh) scale(0.93); }
+  75%  { transform: translate(12vw, -3vh)  scale(1.04); }
+  100% { transform: translate(6vw,  -8vh)  scale(1.09); }
+}
+
+/* ── Noise grain overlay ── */
+#root::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.028;
+  pointer-events: none;
+  z-index: 9999;
 }
 
 /* ── Liquid glass card ── */
 .glass-card {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.10) 0%,
-    rgba(255, 255, 255, 0.04) 50%,
-    rgba(255, 255, 255, 0.07) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  ),
+  linear-gradient(135deg, rgba(12, 6, 28, 0.72) 0%, rgba(8, 4, 20, 0.68) 100%);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 8px 32px rgba(0, 0, 0, 0.4),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .glass-card-hover {
@@ -76,15 +157,24 @@ body {
 .glass-sidebar {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.04) 100%
+    rgba(12, 6, 30, 0.80) 0%,
+    rgba(8, 4, 20, 0.75) 100%
   );
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border-right: 1px solid rgba(255, 255, 255, 0.10);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.05),
-    4px 0 24px rgba(0, 0, 0, 0.3);
+    inset -1px 0 0 rgba(255, 255, 255, 0.04),
+    4px 0 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Active nav item ── */
+.nav-item-active {
+  background: rgba(120, 60, 220, 0.18);
+  color: #f2f2f2;
+  border-left: 2px solid rgba(150, 90, 255, 0.75);
+  padding-left: calc(0.75rem - 2px);
+  box-shadow: inset 0 0 16px rgba(120, 60, 220, 0.10);
 }
 
 /* ── Liquid glass modal ── */

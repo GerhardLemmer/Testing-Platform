@@ -16,15 +16,15 @@ function AppShell({ children, onNavigate, currentPage }) {
                     )}
                 </div>
 
-                <nav className="flex-1 px-4 py-4 space-y-1">
-                    <p className="text-ash-500 text-xs uppercase tracking-wider mb-2 px-3">Navigation</p>
+                <nav className="flex-1 px-3 py-4 space-y-0.5">
+                    <p className="text-ash-500 text-xs uppercase tracking-widest mb-3 px-3">Navigation</p>
 
                     <button
                         onClick={() => onNavigate?.('scenarios')}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                        className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all ${
                             currentPage === 'scenarios' || !currentPage
-                                ? 'bg-white/[0.09] text-ash-50'
-                                : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50'
+                                ? 'nav-item-active'
+                                : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50 border-l-2 border-transparent'
                         }`}
                     >
                         Scenarios
@@ -33,22 +33,24 @@ function AppShell({ children, onNavigate, currentPage }) {
                     {isDeveloper && (
                         <button
                             onClick={() => onNavigate?.('builder')}
-                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                            className={`w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all ${
                                 currentPage === 'builder'
-                                    ? 'bg-white/[0.09] text-ash-50'
-                                    : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50'
+                                    ? 'nav-item-active'
+                                    : 'text-ash-300 hover:bg-white/[0.06] hover:text-ash-50 border-l-2 border-transparent'
                             }`}
                         >
                             Builder
                         </button>
                     )}
 
-                    <button
-                        onClick={() => setSelectedDomain(null)}
-                        className="w-full text-left px-3 py-2 rounded-lg text-ash-400 hover:bg-white/[0.06] hover:text-ash-200 text-sm transition-colors"
-                    >
-                        Change Domain
-                    </button>
+                    <div className="pt-3 mt-3 border-t border-white/[0.06]">
+                        <button
+                            onClick={() => setSelectedDomain(null)}
+                            className="w-full text-left px-3 py-2.5 rounded-lg text-ash-500 hover:bg-white/[0.05] hover:text-ash-300 text-sm transition-all border-l-2 border-transparent"
+                        >
+                            Change Domain
+                        </button>
+                    </div>
                 </nav>
 
                 <div className="px-6 py-4 border-t border-white/[0.07]">

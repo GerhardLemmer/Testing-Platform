@@ -22,3 +22,5 @@ export const runScenario = (scenarioType, scenarioName, domainId, inputData) => 
 export const getOrganizations = () => request('/organizations')
 export const createDomain = (name, organization_id = null) => request('/domains', {method: 'POST', body: JSON.stringify({name, organization_id})})
 export const createScenario = (payload) => request('/scenarios', {method: 'POST', body: JSON.stringify(payload)})
+export const getScenarioById = (scenarioId) => request(`/scenarios/${scenarioId}`)
+export const updateScenario = (scenarioId, payload) => request(`/scenarios/${scenarioId}`, {method: 'PUT', body: JSON.stringify(payload)})

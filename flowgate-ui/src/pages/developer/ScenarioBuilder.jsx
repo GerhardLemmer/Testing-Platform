@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getScenarios, createScenario } from '../../api/api.js'
+import { useCallback, useEffect, useState } from 'react'
+import { getScenarios, createScenario, getScenarioById, updateScenario } from '../../api/api.js'
 import { useApp } from '../../context/AppContext.jsx'
 import AppShell from '../../components/AppShell.jsx'
 
@@ -88,7 +88,7 @@ function StepCard({ step, index, onChange, onRemove, defaultOpen }) {
   }
 
   return (
-    <div className="glass-card rounded-xl overflow-hidden">
+    <div className="glass-card rounded-xl overflow-hidden border-l-2 border-l-[rgba(130,70,255,0.45)]">
       <div
         className="flex items-center justify-between px-5 py-3 cursor-pointer hover:bg-white/[0.04] transition-colors"
         onClick={() => setOpen(o => !o)}
@@ -211,11 +211,54 @@ function InputRow({ input, onChange, onRemove }) {
   )
 }
 
-function ScenarioEditor({ domainId, onSaved }) {
+function ScenarioEditor({ domainId, scenarioId, onSaved }) {
   const [form, setForm] = useState(emptyForm())
+  const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+
+  const isEditing = !!scenarioId
+
+  useEffect(() => {
+    if (!scenarioId) return
+
+    async function load() {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await getScenarioById(scenarioId)
+        setForm({
+          scenario_type: data.scenario_type,
+          scenario_name: data.scenario_name,
+          display_name: data.display_name,
+          steps: data.steps.map(s => ({
+            name: s.name,
+            default_outcome: s.default_outcome,
+            rules: s.rules.map(r => ({
+              field: r.field,
+              operator: r.operator,
+              value: r.value,
+              outcome: r.outcome,
+              message: r.message
+            }))
+          })),
+          inputs: data.inputs.map(i => ({
+            field: i.field,
+            type: i.type,
+            label: i.label,
+            required: i.required
+          }))
+        })
+      } catch {
+        setError('Failed to load scenario')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [scenarioId])
 
   function updateStep(index, updated) {
     setForm(f => ({ ...f, steps: f.steps.map((s, i) => i === index ? updated : s) }))
@@ -263,15 +306,23 @@ function ScenarioEditor({ domainId, onSaved }) {
         })),
         inputs: form.inputs.map((inp, i) => ({ ...inp, order: i + 1 }))
       }
-      await createScenario(payload)
+      if (isEditing) {
+        await updateScenario(scenarioId, payload)
+      } else {
+        await createScenario(payload)
+        setForm(emptyForm())
+      }
       setSuccess(true)
-      setForm(emptyForm())
       onSaved()
     } catch {
       setError('Failed to save scenario')
     } finally {
       setSaving(false)
     }
+  }
+
+  if (loading) {
+    return <p className="text-ash-400 text-sm">Loading scenario...</p>
   }
 
   return (
@@ -371,10 +422,10 @@ function ScenarioEditor({ domainId, onSaved }) {
           disabled={saving}
           className="btn-primary px-6 py-2.5 rounded-lg text-sm"
         >
-          {saving ? 'Saving...' : 'Save Scenario'}
+          {saving ? 'Saving...' : isEditing ? 'Update Scenario' : 'Save Scenario'}
         </button>
         {error && <p className="text-red-400 text-sm">{error}</p>}
-        {success && <p className="text-green-400 text-sm">Scenario saved successfully</p>}
+        {success && <p className="text-green-400 text-sm">{isEditing ? 'Scenario updated' : 'Scenario saved successfully'}</p>}
       </div>
     </div>
   )
@@ -385,11 +436,11 @@ function ScenarioBuilder({ onNavigate }) {
   const [scenarios, setScenarios] = useState([])
   const [view, setView] = useState('new')
 
-  function loadScenarios() {
+  const loadScenarios = useCallback(() => {
     getScenarios(selectedDomain.id).then(setScenarios).catch(() => {})
-  }
+  }, [selectedDomain.id])
 
-  useEffect(() => { loadScenarios() }, [selectedDomain.id])
+  useEffect(() => { loadScenarios() }, [loadScenarios])
 
   return (
     <AppShell onNavigate={onNavigate} currentPage="builder">
@@ -400,9 +451,7 @@ function ScenarioBuilder({ onNavigate }) {
           <button
             onClick={() => setView('new')}
             className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-              view === 'new'
-                ? 'btn-primary'
-                : 'btn-ghost'
+              view === 'new' ? 'btn-primary' : 'btn-ghost'
             }`}
           >
             + New Scenario
@@ -433,19 +482,18 @@ function ScenarioBuilder({ onNavigate }) {
 
         {/* Right panel — editor */}
         <div className="flex-1 overflow-auto">
-          {view === 'new' ? (
-            <div>
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-ash-50 tracking-tight">New Scenario</h2>
-                <p className="text-ash-400 text-sm mt-1">{selectedDomain.name}</p>
-              </div>
-              <ScenarioEditor domainId={selectedDomain.id} onSaved={loadScenarios} />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-ash-500">Scenario editing coming soon</p>
-            </div>
-          )}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-ash-50 tracking-tight">
+              {view === 'new' ? 'New Scenario' : 'Edit Scenario'}
+            </h2>
+            <p className="text-ash-400 text-sm mt-1">{selectedDomain.name}</p>
+          </div>
+          <ScenarioEditor
+            key={view}
+            domainId={selectedDomain.id}
+            scenarioId={view === 'new' ? null : view}
+            onSaved={loadScenarios}
+          />
         </div>
 
       </div>

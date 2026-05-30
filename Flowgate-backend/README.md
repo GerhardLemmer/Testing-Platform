@@ -18,18 +18,11 @@ NOT an API mocking tool. Flowgate simulates real business workflows — loan app
 Clean Architecture — dependencies flow inward only.
 
 ```
-infrastructure/     → Database, auth, Keycloak, repositories
+infrastructure/     → Database, auth, Keycloak, repositories, shared dependencies
 adapters/           → Controllers (route handlers), Pydantic schemas
 application/        → Use cases (orchestration)
 domain/             → Entities (core business logic, no external dependencies)
 ```
-
-### Repository Pattern
-All database queries are split into focused files under `infrastructure/repositories/`:
-- `user_repository.py`
-- `organization_repository.py`
-- `domain_repository.py`
-- `scenario_repository.py`
 
 ---
 
@@ -83,26 +76,26 @@ All endpoints require a Bearer token from Keycloak.
 ### Domains
 | Method | Endpoint | Roles |
 |--------|----------|-------|
-| GET | `/domains` | all |
 | POST | `/domains` | admin, developer |
+| GET | `/domains` | all |
 
 ### Scenarios
-| Method | Endpoint | Notes |
-|--------|----------|-------|
-| GET | `/scenarios?domain_id=` | domain_id required |
-| POST | `/scenarios` | admin, developer |
-| GET | `/scenarios/{id}` | full nested response — steps, rules, inputs |
-| PUT | `/scenarios/{id}` | admin, developer — delete-and-recreate steps/rules/inputs |
-| DELETE | `/scenarios/{id}` | admin, developer — cascade deletes all related data |
-| GET | `/scenarios/{id}/inputs` | input schema for form rendering |
-| GET | `/scenarios/{id}/runs` | run history, newest first |
-| POST | `/scenarios/run` | runs scenario, validates required inputs first |
+| Method | Endpoint | Roles | Notes |
+|--------|----------|-------|-------|
+| GET | `/scenarios?domain_id=` | all | Domain access checked |
+| POST | `/scenarios` | admin, developer | |
+| GET | `/scenarios/{id}` | all | Domain access checked |
+| PUT | `/scenarios/{id}` | admin, developer | Domain access checked |
+| DELETE | `/scenarios/{id}` | admin, developer | Domain access checked |
+| GET | `/scenarios/{id}/inputs` | all | |
+| GET | `/scenarios/{id}/runs` | all | Newest first |
+| POST | `/scenarios/run` | all | Domain access checked |
 
 ### Organizations
 | Method | Endpoint | Roles |
 |--------|----------|-------|
-| GET | `/organizations` | all |
 | POST | `/organizations` | all |
+| GET | `/organizations` | all |
 | POST | `/organizations/{org_id}/members` | org admin |
 
 ---
@@ -120,6 +113,14 @@ All endpoints require a Bearer token from Keycloak.
 `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `contains`
 
 First matching rule wins. If no rule matches, `default_outcome` applies.
+
+---
+
+## Shared Helpers (`infrastructure/dependencies.py`)
+
+- `get_current_user` — validates JWT, auto-creates user in DB on first login, attaches roles
+- `require_role(roles)` — FastAPI dependency, raises 403 if user lacks required role
+- `check_domain_access(domain_id, current_user, db)` — raises 403/404 if user doesn't own or belong to the domain; used across all scenario endpoints
 
 ---
 
@@ -169,15 +170,13 @@ First matching rule wins. If no rule matches, `default_outcome` applies.
 ### Done
 - Keycloak JWT auth end to end
 - Role-based access control (admin, developer, qa, viewer)
-- Multi-tenancy — personal and org-shared domains with isolation enforced
-- Rule-based scenario engine — first match wins, default_outcome fallback
+- Multi-tenancy — personal and org-shared domains
+- Domain-level access control on all scenario endpoints via `check_domain_access()`
+- Rule-based scenario engine
+- Full scenario CRUD with delete cascade
 - ScenarioInput — declared input schema per scenario
-- Input validation on execution — 422 with missing field list if required inputs absent
+- Input validation on execution — 422 with missing field list
 - ScenarioRun — execution recorded on every run
-- Full scenario CRUD — GET (list + single), POST, PUT, DELETE
-- Run history — `GET /scenarios/{id}/runs`
-- Repository pattern — split into `infrastructure/repositories/`
 
 ### Up Next
-- Org invite system — GitHub-style inbox, users receive invites and can Accept/Decline
-- Domain-level access control on single-scenario endpoints (GET/{id}, PUT, DELETE)
+- Org invite system — `OrgInvite` model (id, org_id, invited_email, invited_by, status, created_at), invite endpoints, accept/decline flow

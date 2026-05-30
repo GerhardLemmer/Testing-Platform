@@ -14,6 +14,8 @@ Flowgate simulates real business workflows — loan approvals, payment flows, or
 C:\Testing-Platform\
 ├── Flowgate-backend\    → Python + FastAPI backend
 ├── flowgate-ui\         → React + Tailwind frontend
+├── HANDOFF.md           → session state and what to build next
+├── HOME_SETUP.md        → fresh machine setup guide
 └── README.md
 ```
 
@@ -54,7 +56,7 @@ npm run dev
 | Backend | Python 3.14 + FastAPI |
 | Auth | Keycloak (Docker) |
 | Database | PostgreSQL (Docker) |
-| Frontend | React 19 + Vite + Tailwind CSS v4 |
+| Frontend | React 19 + Vite 8 + Tailwind CSS v4 |
 
 ---
 
@@ -62,25 +64,23 @@ npm run dev
 
 ### Completed
 - Keycloak auth end to end
-- Domain management (personal + org) with isolation enforced
+- Domain management (personal + org) with domain-level access control on all scenario endpoints
 - Rule-based scenario engine
-- ScenarioRun history recording
-- ScenarioInput schema declaration
-- Input validation on execution — 422 with missing field list
 - Full scenario CRUD — GET (list + single with nested steps/rules/inputs), POST, PUT, DELETE
-- Run history endpoint — `GET /scenarios/{id}/runs`
-- Backend repository pattern — split into `repositories/` folder
-- Frontend app shell (sidebar, nav, logout)
-- Frontend domain selector — Personal / Organisation sections + create domain modal
-- Frontend scenario list — role-gated Edit button
-- Frontend QA run page — auto-rendered form from input schema, step-by-step results
-- Frontend ScenarioBuilder — create scenario with steps, rules, and input fields
+- ScenarioInput schema declaration + input validation on execution (422 with missing field list)
+- ScenarioRun history recording — `GET /scenarios/{id}/runs`
+- Backend repository pattern — split into `infrastructure/repositories/`
+- `check_domain_access()` helper — reusable domain membership check in `dependencies.py`
+- Frontend: login → domain selector → scenario list → run scenario
+- Frontend ScenarioBuilder — create and edit scenarios with steps, rules, and input fields
+- Animated glassmorphism UI — three drifting light orbs, noise grain, dark glass cards
+
+### Up Next
+- Run history page (frontend) — list past ScenarioRuns per scenario
+- Create organisation page (frontend)
+- Org invite system (backend + frontend) — GitHub-style inbox, replaces direct-add member flow
 
 ### Planned
-- Scenario edit form — load existing scenario into ScenarioBuilder, save via PUT
-- Run history page — list past ScenarioRuns per scenario
-- Create organisation page
-- **Org invite system** — GitHub-style inbox where users receive org/domain invites and can Accept or Decline. Invite button on domain management page searches by username or email and sends a pending invite. Replaces the current direct-add member flow for normal users.
 - AI-assisted workflow extraction
 
 ---
@@ -89,3 +89,5 @@ npm run dev
 
 - [Backend README](Flowgate-backend/README.md)
 - [Frontend README](flowgate-ui/README.md)
+- [Session Handoff](HANDOFF.md)
+- [Home Machine Setup](HOME_SETUP.md)

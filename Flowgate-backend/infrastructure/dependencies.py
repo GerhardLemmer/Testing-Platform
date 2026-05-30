@@ -8,6 +8,8 @@ from domain.entities.models import User
 from keycloak import KeycloakOpenID
 from dotenv import load_dotenv
 from typing import List
+from infrastructure.repositories.domain_repository import get_domain_by_id
+from infrastructure.repositories.organization_repository import get_organization_member
 
 load_dotenv()
 
@@ -62,3 +64,14 @@ def require_role(allowed_roles: List[str]):
             raise HTTPException(status_code=403, detail="Insufficient permissions")
         return current_user
     return role_checker
+
+def check_domain_access(domain_id: str, current_user: User, db: Session):
+    domain = get_domain_by_id(db, domain_id)
+    if not domain: 
+        raise HTTPException(status_code=404, detail="Domain not found")
+    if domain.user_id != current_user.id:
+        if not domain.organization_id:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
+        member = get_organization_member(db, domain.organization_id, current_user.id)
+        if not member:
+            raise HTTPException(status_code=403, detail="Access denied to this domain")
