@@ -15,4 +15,10 @@ keycloak.init({ onLoad: 'login-required', pkceMethod: 'S256' }).then((authentica
       </StrictMode>
     )
   }
+}).catch((err) => {
+  console.error('Keycloak init failed:', err)
+  document.getElementById('root').innerHTML =
+    `<div style="color:red;padding:2rem;font-family:monospace">
+      <b>Keycloak init failed</b><br/>${err?.message ?? JSON.stringify(err)}
+    </div>`
 })

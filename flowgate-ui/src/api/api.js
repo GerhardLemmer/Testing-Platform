@@ -2,6 +2,7 @@ const BASE_URL = '/api'
 
 async function request(path, options = {}) {
     const keycloak = (await(import('../keycloak'))).default
+    await keycloak.updateToken(30)
     const response = await fetch(`${BASE_URL}${path}`, {
         ...options,
         headers: {
