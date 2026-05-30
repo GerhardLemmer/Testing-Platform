@@ -1,0 +1,94 @@
+@startuml 001 - Org Invite System
+allowmixing
+
+title Flowgate — Org Invite System\nLogical Flow & Data Model
+
+skinparam backgroundColor white
+skinparam defaultFontColor black
+skinparam ArrowColor black
+skinparam actorBorderColor black
+
+skinparam entity {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+
+skinparam rectangle {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+
+skinparam package {
+  BackgroundColor white
+  BorderColor black
+  FontColor black
+}
+
+' ── DATA MODEL ────────────────────────────────────────────────────
+package "New DB Model" {
+  entity OrgInvite {
+    + id : UUID (PK)
+    --
+    org_id : UUID (FK → Organization)
+    invited_email : String
+    invited_by : UUID (FK → User)
+    status : Enum [pending, accepted, declined]
+    created_at : DateTime
+  }
+}
+
+' ── ACTORS ────────────────────────────────────────────────────────
+actor "Org Admin" as Admin
+actor "Invitee" as Invitee
+
+' ── SEND INVITE FLOW ──────────────────────────────────────────────
+rectangle "POST /organizations/{id}/invites" as SendInvite {
+  rectangle "1. Caller must be org admin" as A1
+  rectangle "2. Email must not already be a member" as A2
+  rectangle "3. No duplicate pending invite for same email+org" as A3
+  rectangle "4. Create OrgInvite (status=pending)" as A4
+}
+
+Admin --> SendInvite
+
+A1 -down-> A2
+A2 -down-> A3
+A3 -down-> A4
+
+' ── LIST MY INVITES ───────────────────────────────────────────────
+rectangle "GET /invites/me" as ListInvites {
+  rectangle "1. Auth — identify caller's email" as B1
+  rectangle "2. Return all OrgInvites where\ninvited_email = caller email\nAND status = pending" as B2
+}
+
+Invitee --> ListInvites
+B1 -down-> B2
+
+' ── ACCEPT / DECLINE ──────────────────────────────────────────────
+rectangle "POST /invites/{invite_id}/accept\nPOST /invites/{invite_id}/decline" as Respond {
+  rectangle "1. Auth — caller's email must match invite" as C1
+  rectangle "2. Invite must be in pending status" as C2
+  rectangle "3a. ACCEPT → set status=accepted\n    + create OrganizationMember row\n    (role = viewer by default)" as C3a
+  rectangle "3b. DECLINE → set status=declined\n    no membership created" as C3b
+}
+
+Invitee --> Respond
+C1 -down-> C2
+C2 -down-> C3a
+C2 -down-> C3b
+
+' ── NOTES ─────────────────────────────────────────────────────────
+note right of SendInvite
+  Guard: only org_admin role
+  can send invites for that org
+end note
+
+note right of Respond
+  Invite can only be acted on once.
+  Subsequent accept/decline on a
+  non-pending invite → 409 Conflict
+end note
+
+@enduml

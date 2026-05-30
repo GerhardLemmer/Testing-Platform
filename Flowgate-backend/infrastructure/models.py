@@ -1,3 +1,6 @@
+import string
+from uuid import UUID
+
 from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Enum, DateTime
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship
@@ -103,3 +106,13 @@ class ScenarioInput(Base):
     label = Column(String, nullable=False)
     required = Column(Boolean, nullable=False, default=True)
     order = Column(Integer, nullable=False, default=0)
+
+class OrgInvite(Base):
+    __tablename__ = "org_invites"
+
+    id = Column(String, primary_key=True)
+    organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
+    invited_email = Column(String, nullable=False)
+    invited_by = Column(UUID, ForeignKey("users.id"), nullable=False)
+    status = Column(string, nullable=False, default="pending")
+    created_at = Column(DateTime, nullable=False)
