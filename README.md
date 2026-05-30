@@ -89,5 +89,3 @@ npm run dev
 
 - [Backend README](Flowgate-backend/README.md)
 - [Frontend README](flowgate-ui/README.md)
-- [Session Handoff](HANDOFF.md)
-- [Home Machine Setup](HOME_SETUP.md)
