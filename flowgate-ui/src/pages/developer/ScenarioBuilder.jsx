@@ -437,10 +437,22 @@ function ScenarioBuilder({ onNavigate }) {
   const [view, setView] = useState('new')
 
   const loadScenarios = useCallback(() => {
+    if (!selectedDomain) return
     getScenarios(selectedDomain.id).then(setScenarios).catch(() => {})
-  }, [selectedDomain.id])
+  }, [selectedDomain])
 
   useEffect(() => { loadScenarios() }, [loadScenarios])
+
+  if (!selectedDomain) return (
+    <AppShell onNavigate={onNavigate} currentPage="builder">
+      <div className="flex flex-col items-center justify-center h-full min-h-[60vh] text-center">
+        <div className="glass-card rounded-2xl px-10 py-12 max-w-md">
+          <h2 className="text-ash-50 text-xl font-semibold mb-2">No domain selected</h2>
+          <p className="text-ash-300 text-sm">Select a domain from the sidebar to use the builder.</p>
+        </div>
+      </div>
+    </AppShell>
+  )
 
   return (
     <AppShell onNavigate={onNavigate} currentPage="builder">

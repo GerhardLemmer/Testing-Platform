@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getScenarioRuns } from '../../api/api.js'
 import AppShell from '../../components/AppShell.jsx'
 
-function RunHistory({ scenario, onBack }) {
+function RunHistory({ scenario, onBack, onNavigate }) {
   const [runs, setRuns] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -22,7 +22,7 @@ function RunHistory({ scenario, onBack }) {
   }
 
   return (
-    <AppShell>
+    <AppShell onNavigate={onNavigate} currentPage="scenarios">
       <div className="max-w-3xl">
         <div className="flex items-center gap-4 mb-8">
           <button

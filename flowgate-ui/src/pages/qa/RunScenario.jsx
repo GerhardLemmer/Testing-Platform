@@ -3,7 +3,7 @@ import { getScenarioInputs, runScenario } from '../../api/api.js'
 import { useApp } from '../../context/AppContext.jsx'
 import AppShell from '../../components/AppShell.jsx'
 
-function RunScenario({ scenario, onBack }) {
+function RunScenario({ scenario, onBack, onNavigate }) {
   const { selectedDomain } = useApp()
   const [inputs, setInputs] = useState([])
   const [formData, setFormData] = useState({})
@@ -84,7 +84,7 @@ function RunScenario({ scenario, onBack }) {
   }
 
   return (
-    <AppShell>
+    <AppShell onNavigate={onNavigate} currentPage="scenarios">
       <div className="max-w-2xl">
         <div className="flex items-center gap-4 mb-8">
           <button

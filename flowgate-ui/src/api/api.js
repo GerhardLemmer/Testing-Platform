@@ -26,3 +26,6 @@ export const createScenario = (payload) => request('/scenarios', {method: 'POST'
 export const getScenarioById = (scenarioId) => request(`/scenarios/${scenarioId}`)
 export const updateScenario = (scenarioId, payload) => request(`/scenarios/${scenarioId}`, {method: 'PUT', body: JSON.stringify(payload)})
 export const getScenarioRuns = (scenarioId) => request(`/scenarios/${scenarioId}/runs`)
+export const sendInvite = (orgId, invitedEmail) => request(`/organizations/${orgId}/invites`, { method: 'POST', body: JSON.stringify({ organization_id: orgId, invited_email: invitedEmail }) })
+export const getInvites = () => request('/invites')
+export const respondToInvite = (inviteId, status) => request(`/invites/${inviteId}`, { method: 'PUT', body: JSON.stringify({ status }) })

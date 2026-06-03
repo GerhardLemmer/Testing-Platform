@@ -1,6 +1,7 @@
 import uuid
 from sqlalchemy.orm import Session
-from infrastructure.models import Organization, OrganizationMember
+from infrastructure.models import Organization, OrganizationMember, OrgInvite
+from datetime import datetime
 
 
 def create_organization(db: Session, name: str, owner_id: str):
@@ -49,3 +50,33 @@ def get_organization_member(db: Session, org_id: str, user_id: str):
         )
         .first()
     )
+
+def create_org_invite(db: Session, org_id: str, invited_email: str, invited_by: str):
+    invite = OrgInvite(
+        id=str(uuid.uuid4()),
+        organization_id=org_id,
+        invited_email=invited_email,
+        invited_by=invited_by,
+        status="pending",
+        created_at=datetime.utcnow()
+    )
+    db.add(invite)
+    db.commit()
+    db.refresh(invite)
+    return invite
+
+def get_invites_for_user(db: Session, email: str):
+    return (
+        db.query(OrgInvite, Organization.name)
+        .join(Organization, Organization.id == OrgInvite.organization_id)
+        .filter(OrgInvite.invited_email == email)
+        .all()
+    )
+
+def update_invite_status(db: Session, invite_id: str, new_status: str):
+    invite = db.query(OrgInvite).filter(OrgInvite.id == invite_id).first()
+    if invite:
+        invite.status = new_status
+        db.commit()
+        db.refresh(invite)
+    return invite

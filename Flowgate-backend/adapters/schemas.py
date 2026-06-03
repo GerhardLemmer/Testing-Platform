@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Optional, Any, Dict
+from datetime import datetime
 
 class StepRuleSchema(BaseModel):
     field: str
@@ -46,3 +47,20 @@ class ScenarioCreateSchema(BaseModel):
     display_name: str
     steps: List[StepSchema]
     inputs: List[ScenarioInputSchema] = []
+
+class OrgInviteCreateSchema(BaseModel):
+    organization_id: str
+    invited_email: str
+
+class OrgInviteResponseSchema(BaseModel):
+    id: str
+    organization_id: str
+    organization_name: str
+    invited_email: str
+    invited_by: str
+    status: str
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+class RespondToInviteSchema(BaseModel):
+    status: str

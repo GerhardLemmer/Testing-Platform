@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getOrganizations, createOrganization } from '../api/api.js'
+import { getOrganizations, createOrganization, sendInvite } from '../api/api.js'
 import AppShell from '../components/AppShell.jsx'
 
 function Organisations({ onNavigate }) {
@@ -10,6 +10,11 @@ function Organisations({ onNavigate }) {
   const [orgName, setOrgName] = useState('')
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState(null)
+  const [inviteOrgId, setInviteOrgId] = useState(null)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviting, setInviting] = useState(false)
+  const [inviteError, setInviteError] = useState(null)
+  const [inviteSuccess, setInviteSuccess] = useState(null)
 
   useEffect(() => {
     fetchOrgs()
@@ -37,6 +42,37 @@ function Organisations({ onNavigate }) {
       setCreateError('Failed to create organisation')
     } finally {
       setCreating(false)
+    }
+  }
+
+  function openInvite(orgId) {
+    setInviteOrgId(orgId)
+    setInviteEmail('')
+    setInviteError(null)
+    setInviteSuccess(null)
+  }
+
+  function closeInvite() {
+    setInviteOrgId(null)
+    setInviteEmail('')
+    setInviteError(null)
+    setInviteSuccess(null)
+  }
+
+  async function handleInvite(e) {
+    e.preventDefault()
+    if (!inviteEmail.trim()) return
+    setInviting(true)
+    setInviteError(null)
+    setInviteSuccess(null)
+    try {
+      await sendInvite(inviteOrgId, inviteEmail.trim())
+      setInviteSuccess(`Invite sent to ${inviteEmail.trim()}`)
+      setInviteEmail('')
+    } catch {
+      setInviteError('Failed to send invite. Check the email is registered.')
+    } finally {
+      setInviting(false)
     }
   }
 
@@ -98,13 +134,55 @@ function Organisations({ onNavigate }) {
 
         <div className="grid grid-cols-1 gap-4">
           {orgs.map(org => (
-            <div key={org.id} className="glass-card rounded-xl px-6 py-4 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-ash-50">{org.name}</p>
-                {org.role && (
-                  <p className="text-ash-400 text-sm mt-1 capitalize">{org.role}</p>
+            <div key={org.id} className="glass-card rounded-xl px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-ash-50">{org.name}</p>
+                  {org.role && (
+                    <p className="text-ash-400 text-sm mt-1 capitalize">{org.role}</p>
+                  )}
+                </div>
+                {inviteOrgId !== org.id && (
+                  <button
+                    onClick={() => openInvite(org.id)}
+                    className="btn-ghost px-3 py-1.5 rounded-lg text-sm"
+                  >
+                    Invite Member
+                  </button>
                 )}
               </div>
+
+              {inviteOrgId === org.id && (
+                <form onSubmit={handleInvite} className="mt-4 pt-4 border-t border-white/[0.07]">
+                  <p className="text-ash-300 text-sm mb-3">Send an invite by email</p>
+                  <div className="flex gap-3">
+                    <input
+                      type="email"
+                      value={inviteEmail}
+                      onChange={e => setInviteEmail(e.target.value)}
+                      placeholder="email@example.com"
+                      className="glass-input flex-1 px-4 py-2 rounded-lg text-sm"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      disabled={inviting || !inviteEmail.trim()}
+                      className="btn-primary px-4 py-2 rounded-lg text-sm disabled:opacity-50"
+                    >
+                      {inviting ? 'Sending...' : 'Send'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={closeInvite}
+                      className="btn-ghost px-4 py-2 rounded-lg text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {inviteError && <p className="text-red-400 text-sm mt-2">{inviteError}</p>}
+                  {inviteSuccess && <p className="text-green-400 text-sm mt-2">{inviteSuccess}</p>}
+                </form>
+              )}
             </div>
           ))}
         </div>

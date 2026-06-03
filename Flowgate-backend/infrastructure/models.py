@@ -1,6 +1,3 @@
-import string
-from uuid import UUID
-
 from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Enum, DateTime
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship
@@ -113,6 +110,6 @@ class OrgInvite(Base):
     id = Column(String, primary_key=True)
     organization_id = Column(String, ForeignKey("organizations.id"), nullable=False)
     invited_email = Column(String, nullable=False)
-    invited_by = Column(UUID, ForeignKey("users.id"), nullable=False)
-    status = Column(string, nullable=False, default="pending")
+    invited_by = Column(String, ForeignKey("users.id"), nullable=False)
+    status = Column(String, nullable=False, default="pending")
     created_at = Column(DateTime, nullable=False)
