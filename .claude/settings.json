@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Testing-Platform\")",
+      "Bash(Select-Object Name, PSIsContainer)"
+    ]
+  }
+}
